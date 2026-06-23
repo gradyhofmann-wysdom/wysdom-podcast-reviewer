@@ -129,16 +129,50 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .empty{text-align:center;padding:1.5rem 1rem;color:var(--g400);font-size:14px}
 .export-note{font-size:12px;color:var(--g600);margin-top:8px;line-height:1.5}
 
+/* Episode action menu */
+.ep-menu-btn{width:30px;height:30px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--g400);transition:background .1s}
+.ep-menu-btn:hover{background:var(--g200);color:var(--g600)}
+.ep-menu-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.ep-dropdown{position:absolute;right:0;top:calc(100% + 4px);background:white;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:100;min-width:160px;overflow:hidden}
+.ep-dropdown button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 14px;border:none;background:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--g900);text-align:left}
+.ep-dropdown button:hover{background:var(--g100)}
+.ep-dropdown button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ep-dropdown .danger{color:#a32d2d}
+.ep-dropdown .danger:hover{background:#FCEBEB}
+.ep-dropdown .divider-line{height:1px;background:var(--g200);margin:4px 0}
+.ep-row{position:relative}
+
+/* Status badge */
+.status-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;flex-shrink:0;letter-spacing:.02em}
+.status-needs-review{background:#E6F1FB;color:#185FA5}
+.status-in-progress{background:#FAEEDA;color:#854F0B}
+.status-done{background:#EAF3DE;color:#3B6D11}
+.status-archived{background:var(--g200);color:var(--g600)}
+
+/* Move modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:white;border-radius:var(--r-xl);padding:1.5rem;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:4px}
+.modal p{font-size:13px;color:var(--g600);margin-bottom:1.25rem}
+.modal-actions{display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end}
+select{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--r-md);font-size:14px;font-family:inherit;background:white;color:var(--g900);outline:none;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235f5e5a' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:focus{border-color:var(--blue)}
+
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a18;color:white;padding:10px 18px;border-radius:var(--r-md);font-size:13px;opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(prefers-color-scheme:dark){
   :root{--g100:#1e1e1c;--g200:#2e2e2b;--g400:#888780;--g600:#b4b2a9;--g900:#f5f4f0;--blue-light:#0c1e30;--coral-light:#2a1410;--coral-border:#7a3a22;--coral-dark:#f0997b}
-  .card,.login-card,.folder-row,.ep-row,.note-item,.collab-row{background:#1a1a18}
+  .card,.login-card,.folder-row,.ep-row,.note-item,.collab-row,.modal,.ep-dropdown{background:#1a1a18}
   .tab.active{background:#2e2e2b}
-  input[type=text],input[type=password]{background:#1a1a18;color:var(--g900)}
+  input[type=text],input[type=password],select{background:#1a1a18;color:var(--g900)}
   .prog-thumb{border-color:#1a1a18}
   .ndot{border-color:#1a1a18}
+  .ep-dropdown button{color:var(--g900)}
+  .status-needs-review{background:#0c1e30;color:#85B7EB}
+  .status-in-progress{background:#2a1e08;color:#FAC775}
+  .status-done{background:#173404;color:#C0DD97}
+  .status-archived{background:#2e2e2b;color:#888780}
 }
 </style>
 </head>
@@ -311,6 +345,60 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 
 <audio id="main-audio" style="display:none"></audio>
 
+<!-- Move modal -->
+<div class="modal-overlay" id="move-modal" style="display:none" onclick="if(event.target===this)closeMoveModal()">
+  <div class="modal">
+    <h3>Move episode</h3>
+    <p id="move-modal-ep-name" style="font-weight:500;color:var(--g900);margin-bottom:.75rem"></p>
+    <div class="form-group">
+      <label>Move to folder</label>
+      <select id="move-folder-select"></select>
+    </div>
+    <div class="form-group">
+      <label>Or type a new folder name</label>
+      <input type="text" id="move-folder-new" placeholder="New folder name">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeMoveModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmMove()">Move</button>
+    </div>
+  </div>
+</div>
+
+<!-- Status modal -->
+<div class="modal-overlay" id="status-modal" style="display:none" onclick="if(event.target===this)closeStatusModal()">
+  <div class="modal">
+    <h3>Set status</h3>
+    <p id="status-modal-ep-name" style="font-weight:500;color:var(--g900);margin-bottom:.75rem"></p>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="status-select">
+        <option value="needs-review">Needs review</option>
+        <option value="in-progress">In progress</option>
+        <option value="done">Done</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeStatusModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmStatus()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete dialog -->
+<div class="modal-overlay" id="delete-modal" style="display:none" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal">
+    <h3>Delete episode?</h3>
+    <p id="delete-modal-ep-name" style="font-weight:500;color:var(--g900);margin-bottom:.5rem"></p>
+    <p style="font-size:13px;color:var(--g600)">This will permanently delete the episode and all its voice notes. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn" style="background:#FCEBEB;border-color:#f0a0a0;color:#a32d2d" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── CONFIG ──────────────────────────────────────
 const SUPABASE_URL = 'https://osghkfbigroxxxinkdgb.supabase.co';
@@ -433,21 +521,148 @@ function pOpenFolder(folder, items) {
   pRenderEpList(items);
 }
 
+const STATUS_LABELS = {
+  'needs-review': {label:'Needs review', cls:'status-needs-review'},
+  'in-progress':  {label:'In progress',  cls:'status-in-progress'},
+  'done':         {label:'Done',          cls:'status-done'},
+  'archived':     {label:'Archived',      cls:'status-archived'},
+};
+
 async function pRenderEpList(items) {
   const list = document.getElementById('p-ep-items');
   list.innerHTML = '';
   for (const ep of items) {
     const { count } = await sb.from('voice_notes').select('*', { count: 'exact', head: true }).eq('episode_id', ep.id);
+    const st = ep.status ? STATUS_LABELS[ep.status] : null;
     const d = document.createElement('div');
     d.className = 'ep-row';
+    d.style.cursor = 'pointer';
     d.innerHTML = `
       <div class="ep-icon"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
-      <div class="ep-info"><div class="ep-title">${ep.title}</div><div class="ep-sub">${ep.folder}</div></div>
+      <div class="ep-info">
+        <div class="ep-title">${ep.title}</div>
+        <div class="ep-sub">${ep.folder}</div>
+      </div>
+      ${st ? `<span class="status-badge ${st.cls}">${st.label}</span>` : ''}
       ${count > 0 ? `<span class="badge">${count} note${count!==1?'s':''}</span>` : ''}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`;
-    d.onclick = () => openEpisode('p', ep);
+      <button class="ep-menu-btn" aria-label="Episode options" data-epid="${ep.id}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>`;
+    d.querySelector('.ep-info').onclick = () => openEpisode('p', ep);
+    d.querySelector('.ep-icon').onclick = () => openEpisode('p', ep);
+    d.querySelector('.ep-menu-btn').onclick = (e) => { e.stopPropagation(); openEpMenu(e, ep); };
     list.appendChild(d);
   }
+}
+
+let menuEp = null;
+let activeDropdown = null;
+
+function openEpMenu(e, ep) {
+  closeActiveDropdown();
+  menuEp = ep;
+  const btn = e.currentTarget;
+  const dropdown = document.createElement('div');
+  dropdown.className = 'ep-dropdown';
+  dropdown.innerHTML = `
+    <button onclick="openMoveModal()"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Move to folder</button>
+    <button onclick="openStatusModal()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Set status</button>
+    <div class="divider-line"></div>
+    <button class="danger" onclick="openDeleteModal()"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>Delete episode</button>`;
+  btn.parentElement.appendChild(dropdown);
+  activeDropdown = dropdown;
+  setTimeout(() => document.addEventListener('click', closeActiveDropdown, { once: true }), 0);
+}
+
+function closeActiveDropdown() {
+  if (activeDropdown) { activeDropdown.remove(); activeDropdown = null; }
+}
+
+// ── MOVE ────────────────────────────────────────
+function openMoveModal() {
+  closeActiveDropdown();
+  if (!menuEp) return;
+  document.getElementById('move-modal-ep-name').textContent = menuEp.title;
+  document.getElementById('move-folder-new').value = '';
+  const sel = document.getElementById('move-folder-select');
+  sel.innerHTML = '';
+  const folders = [...new Set(currentFolderEps.map(e => e.folder).filter(Boolean))];
+  ['Needs Review', 'In Progress', 'Done', 'Archived', ...folders].filter((v,i,a)=>a.indexOf(v)===i).forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f; opt.textContent = f;
+    if (f === menuEp.folder) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  document.getElementById('move-modal').style.display = 'flex';
+}
+
+function closeMoveModal() { document.getElementById('move-modal').style.display = 'none'; }
+
+async function confirmMove() {
+  const newFolder = document.getElementById('move-folder-new').value.trim()
+    || document.getElementById('move-folder-select').value;
+  if (!newFolder || !menuEp) return;
+  const { error } = await sb.from('episodes').update({ folder: newFolder }).eq('id', menuEp.id);
+  if (error) { toast('Error moving episode: ' + error.message); return; }
+  closeMoveModal();
+  toast('Moved to "' + newFolder + '"');
+  menuEp = null;
+  pShowFolders();
+  pLoadFolders();
+}
+
+// ── STATUS ──────────────────────────────────────
+function openStatusModal() {
+  closeActiveDropdown();
+  if (!menuEp) return;
+  document.getElementById('status-modal-ep-name').textContent = menuEp.title;
+  document.getElementById('status-select').value = menuEp.status || 'needs-review';
+  document.getElementById('status-modal').style.display = 'flex';
+}
+
+function closeStatusModal() { document.getElementById('status-modal').style.display = 'none'; }
+
+async function confirmStatus() {
+  const status = document.getElementById('status-select').value;
+  if (!menuEp) return;
+  const { error } = await sb.from('episodes').update({ status }).eq('id', menuEp.id);
+  if (error) { toast('Error updating status: ' + error.message); return; }
+  closeStatusModal();
+  toast('Status updated!');
+  menuEp.status = status;
+  pRenderEpList(currentFolderEps);
+}
+
+// ── DELETE ──────────────────────────────────────
+function openDeleteModal() {
+  closeActiveDropdown();
+  if (!menuEp) return;
+  document.getElementById('delete-modal-ep-name').textContent = menuEp.title;
+  document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
+
+async function confirmDelete() {
+  if (!menuEp) return;
+  const epToDelete = menuEp;
+  menuEp = null;
+  closeDeleteModal();
+  toast('Deleting…');
+
+  const { data: noteRows } = await sb.from('voice_notes').select('file_path').eq('episode_id', epToDelete.id);
+  if (noteRows && noteRows.length > 0) {
+    await sb.storage.from('notes').remove(noteRows.map(n => n.file_path));
+  }
+  await sb.from('voice_notes').delete().eq('episode_id', epToDelete.id);
+  await sb.storage.from('episodes').remove([epToDelete.file_path]);
+  const { error } = await sb.from('episodes').delete().eq('id', epToDelete.id);
+  if (error) { toast('Error deleting: ' + error.message); return; }
+
+  toast('Episode deleted.');
+  currentFolderEps = currentFolderEps.filter(e => e.id !== epToDelete.id);
+  pShowFolders();
+  pLoadFolders();
 }
 
 function pShowFolders() { hide('p-eplist'); show('p-folders'); stopAudio(); }
