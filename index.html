@@ -15,34 +15,24 @@
   --r-md:10px;--r-lg:16px;--r-xl:24px;
 }
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--g100);color:var(--g900);-webkit-font-smoothing:antialiased}
-body{min-height:100vh;padding:0}
-
-/* Layout */
+body{min-height:100vh}
 .app{max-width:520px;margin:0 auto;padding:1.5rem 1rem 4rem}
 .header{display:flex;align-items:center;gap:10px;margin-bottom:1.75rem}
 .logo{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo svg{width:20px;height:20px}
-.header-text h1{font-size:15px;font-weight:600;letter-spacing:-0.01em}
+.header-text h1{font-size:15px;font-weight:600;letter-spacing:-.01em}
 .header-text p{font-size:12px;color:var(--g600)}
-
-/* Cards */
 .card{background:white;border-radius:var(--r-xl);border:1px solid var(--g200);padding:1.5rem;margin-bottom:1rem}
-.card-title{font-size:13px;font-weight:600;color:var(--g600);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1rem}
-
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--r-md);border:1.5px solid var(--g200);background:var(--g100);font-size:13px;font-weight:500;color:var(--g900);cursor:pointer;font-family:inherit;transition:background .1s}
+.card-title{font-size:12px;font-weight:600;color:var(--g600);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--r-md);border:1.5px solid var(--g200);background:var(--g100);font-size:13px;font-weight:500;color:var(--g900);cursor:pointer;font-family:inherit;transition:background .1s;white-space:nowrap}
 .btn:hover{background:var(--g200)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-primary{background:var(--blue);border-color:var(--blue);color:white}
 .btn-primary:hover{background:#1352a0}
 .btn-sm{padding:6px 12px;font-size:12px}
-.btn-danger{border-color:#f0a0a0;color:#a32d2d}
-.btn-danger:hover{background:#FCEBEB}
 .btn-full{width:100%}
-
-/* Forms */
-input[type=text],input[type=password],select{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--r-md);font-size:14px;font-family:inherit;background:white;color:var(--g900);outline:none;transition:border-color .15s}
-input[type=text]:focus,input[type=password]:focus,select:focus{border-color:var(--blue)}
-label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bottom:6px}
+input[type=text],input[type=password]{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--r-md);font-size:14px;font-family:inherit;background:white;color:var(--g900);outline:none;transition:border-color .15s}
+input[type=text]:focus,input[type=password]:focus{border-color:var(--blue)}
+label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bottom:5px}
 .form-group{margin-bottom:1rem}
 
 /* Login */
@@ -50,124 +40,113 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .login-card{background:white;border-radius:var(--r-xl);border:1px solid var(--g200);padding:2rem;width:100%;max-width:360px}
 .login-card h2{font-size:18px;font-weight:600;margin-bottom:4px}
 .login-card p{font-size:13px;color:var(--g600);margin-bottom:1.5rem}
-.error-msg{font-size:13px;color:#a32d2d;background:#FCEBEB;border-radius:var(--r-md);padding:8px 12px;margin-top:8px;display:none}
-
-/* Folders & episodes */
-.folder-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;transition:background .1s}
-.folder-row:hover{background:var(--g100)}
-.folder-icon{color:var(--blue);font-size:20px}
-.folder-name{font-size:14px;font-weight:500;flex:1}
-.folder-count{font-size:12px;color:var(--g400)}
-.episode-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;transition:background .1s}
-.episode-row:hover{background:var(--g100)}
-.ep-icon{width:36px;height:36px;background:var(--blue-light);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ep-icon svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.ep-info{flex:1;min-width:0}
-.ep-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ep-meta{font-size:12px;color:var(--g400);margin-top:2px}
-.ep-notes-badge{background:var(--coral-light);color:var(--coral-dark);font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;flex-shrink:0}
-.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g600);cursor:pointer;margin-bottom:1rem;background:none;border:none;font-family:inherit;padding:0}
-.back-btn:hover{color:var(--g900)}
-.back-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-/* Upload zone */
-.upload-zone{border:2px dashed var(--g200);border-radius:var(--r-lg);padding:2rem 1.5rem;text-align:center;cursor:pointer;transition:all .15s}
-.upload-zone:hover{border-color:var(--blue-mid);background:var(--blue-light)}
-.upload-zone svg{width:36px;height:36px;stroke:var(--g400);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 10px;display:block}
-.upload-zone h3{font-size:15px;font-weight:600;margin-bottom:4px}
-.upload-zone p{font-size:13px;color:var(--g600)}
-.progress-bar-wrap{background:var(--g200);border-radius:4px;height:6px;margin-top:1rem;overflow:hidden;display:none}
-.progress-bar-fill{height:6px;background:var(--blue);border-radius:4px;width:0%;transition:width .2s}
-
-/* Player */
-.player-header{margin-bottom:1.25rem}
-.player-title{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:2px}
-.player-meta{font-size:13px;color:var(--g600)}
-
-.progress-area{position:relative;height:44px;display:flex;align-items:center;cursor:pointer;margin-bottom:.25rem}
-.progress-track{position:absolute;left:0;right:0;height:5px;background:var(--g200);border-radius:3px}
-.progress-fill{height:5px;background:var(--blue);border-radius:3px;width:0%;pointer-events:none}
-.progress-thumb{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);width:14px;height:14px;background:var(--blue);border-radius:50%;border:2.5px solid white;box-shadow:0 0 0 1px var(--blue);pointer-events:none}
-.note-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;background:var(--coral);border:2px solid white;border-radius:50%;cursor:pointer;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-
-.time-row{display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:1.25rem;font-variant-numeric:tabular-nums}
-
-.controls{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.speed-btn{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--g200);background:var(--g100);font-size:13px;font-weight:600;color:var(--g900);cursor:pointer;font-family:inherit;transition:background .1s}
-.speed-btn:hover{background:var(--g200)}
-.play-btn{width:64px;height:64px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(24,95,165,.3);transition:transform .1s}
-.play-btn:active{transform:scale(.95)}
-.play-btn svg{width:28px;height:28px;fill:white}
-.mic-btn{width:52px;height:52px;border-radius:50%;background:var(--g100);border:1.5px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.mic-btn svg{width:22px;height:22px;stroke:var(--g600);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
-.mic-btn:hover{background:var(--g200)}
-.mic-btn.recording{background:var(--coral);border-color:var(--coral);animation:pulse-mic 1s infinite}
-.mic-btn.recording svg{stroke:white}
-@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(216,90,48,.4)}50%{box-shadow:0 0 0 8px rgba(216,90,48,0)}}
-
-.rec-banner{display:none;align-items:center;gap:10px;background:var(--coral-light);border:1px solid var(--coral-border);border-radius:var(--r-md);padding:10px 14px;margin-top:1rem}
-.rec-banner.visible{display:flex}
-.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);animation:blink 1s infinite;flex-shrink:0}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.rec-banner span{font-size:13px;color:var(--coral-dark);font-weight:500}
-.mic-hint{text-align:center;font-size:12px;color:var(--g400);margin-top:10px}
-
-/* Notes list */
-.note-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;background:white;transition:background .1s,border-color .1s}
-.note-item:hover{background:var(--g100)}
-.note-item.active{border-color:var(--blue);background:var(--blue-light)}
-.note-ts{font-size:12px;font-weight:600;color:var(--blue);min-width:38px;font-variant-numeric:tabular-nums}
-.note-who{font-size:11px;color:var(--g600);min-width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.note-wave{flex:1;display:flex;align-items:center;gap:2px;height:28px}
-.note-wave span{display:inline-block;width:3px;border-radius:2px;background:var(--blue-mid);opacity:.7}
-.note-item.active .note-wave span{background:var(--blue);opacity:1}
-.note-play-icon{width:28px;height:28px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.note-item.active .note-play-icon{background:var(--blue)}
-.note-play-icon svg{width:14px;height:14px;fill:var(--g600)}
-.note-item.active .note-play-icon svg{fill:white}
-
-/* Export */
-.export-section{margin-top:1rem}
-.export-note{font-size:12px;color:var(--g600);margin-top:8px;line-height:1.5}
-
-/* Collaborators */
-.collab-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-md);border:1px solid var(--g200);margin-bottom:8px}
-.collab-avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--blue);flex-shrink:0}
-.collab-info{flex:1;min-width:0}
-.collab-name{font-size:14px;font-weight:500}
-.collab-link{font-size:11px;color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.copy-btn{background:none;border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;color:var(--g600);font-family:inherit}
-.copy-btn:hover{background:var(--g100)}
+.err{font-size:13px;color:#a32d2d;background:#FCEBEB;border-radius:var(--r-md);padding:8px 12px;margin-top:8px;display:none}
 
 /* Tabs */
 .tabs{display:flex;gap:4px;background:var(--g100);border-radius:var(--r-md);padding:4px;margin-bottom:1.25rem}
 .tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--g600);border-radius:8px;cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s}
 .tab.active{background:white;color:var(--g900);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
-/* Toast */
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a18;color:white;padding:10px 18px;border-radius:var(--r-md);font-size:13px;opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap}
+/* Folders */
+.folder-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;transition:background .1s;background:white}
+.folder-row:hover{background:var(--g100)}
+.folder-name{font-size:14px;font-weight:500;flex:1}
+.folder-count{font-size:12px;color:var(--g400)}
+.ep-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;transition:background .1s;background:white}
+.ep-row:hover{background:var(--g100)}
+.ep-icon{width:36px;height:36px;background:var(--blue-light);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ep-icon svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ep-info{flex:1;min-width:0}
+.ep-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep-sub{font-size:12px;color:var(--g400);margin-top:2px}
+.badge{background:var(--coral-light);color:var(--coral-dark);font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g600);cursor:pointer;margin-bottom:1rem;background:none;border:none;font-family:inherit;padding:0}
+.back-btn:hover{color:var(--g900)}
+.back-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Upload */
+.upload-zone{border:2px dashed var(--g200);border-radius:var(--r-lg);padding:2rem 1.5rem;text-align:center;cursor:pointer;transition:all .15s}
+.upload-zone:hover{border-color:var(--blue-mid);background:var(--blue-light)}
+.upload-zone svg{width:36px;height:36px;stroke:var(--g400);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 10px;display:block}
+.upload-zone h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.upload-zone p{font-size:13px;color:var(--g600)}
+.prog-wrap{background:var(--g200);border-radius:4px;height:6px;margin-top:1rem;overflow:hidden;display:none}
+.prog-fill{height:6px;background:var(--blue);border-radius:4px;width:0%;transition:width .3s}
+.upload-status{font-size:13px;color:var(--g600);margin-top:8px;min-height:20px;text-align:center}
+
+/* Player */
+.player-title{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:2px}
+.player-sub{font-size:13px;color:var(--g600);margin-bottom:1.25rem}
+.prog-area{position:relative;height:44px;display:flex;align-items:center;cursor:pointer;margin-bottom:.25rem}
+.prog-track{position:absolute;left:0;right:0;height:5px;background:var(--g200);border-radius:3px}
+.prog-bar{height:5px;background:var(--blue);border-radius:3px;width:0%;pointer-events:none}
+.prog-thumb{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);width:14px;height:14px;background:var(--blue);border-radius:50%;border:2.5px solid white;box-shadow:0 0 0 1.5px var(--blue);pointer-events:none}
+.ndot{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;background:var(--coral);border:2px solid white;border-radius:50%;cursor:pointer;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.time-row{display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:1.25rem;font-variant-numeric:tabular-nums}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.speed-btn{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--g200);background:var(--g100);font-size:13px;font-weight:600;color:var(--g900);cursor:pointer;font-family:inherit}
+.speed-btn:hover{background:var(--g200)}
+.play-btn{width:64px;height:64px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(24,95,165,.3);transition:transform .1s}
+.play-btn:active{transform:scale(.95)}
+.play-btn svg{width:28px;height:28px;fill:white}
+.mic-btn{width:52px;height:52px;border-radius:50%;background:var(--g100);border:1.5px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mic-btn svg{width:22px;height:22px;stroke:var(--g600);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mic-btn:hover{background:var(--g200)}
+.mic-btn.recording{background:var(--coral);border-color:var(--coral);animation:pulse-mic 1s infinite}
+.mic-btn.recording svg{stroke:white}
+@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(216,90,48,.4)}50%{box-shadow:0 0 0 8px rgba(216,90,48,0)}}
+.rec-banner{display:none;align-items:center;gap:10px;background:var(--coral-light);border:1px solid var(--coral-border);border-radius:var(--r-md);padding:10px 14px;margin-top:1rem}
+.rec-banner.on{display:flex}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);animation:blink 1s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.rec-banner span{font-size:13px;color:var(--coral-dark);font-weight:500}
+.mic-hint{text-align:center;font-size:12px;color:var(--g400);margin-top:10px}
+
+/* Notes */
+.note-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;background:white;transition:background .1s,border-color .1s}
+.note-item:hover{background:var(--g100)}
+.note-item.active{border-color:var(--blue);background:var(--blue-light)}
+.note-ts{font-size:12px;font-weight:600;color:var(--blue);min-width:38px;font-variant-numeric:tabular-nums}
+.note-who{font-size:11px;color:var(--g600);min-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-wave{flex:1;display:flex;align-items:center;gap:2px;height:28px}
+.note-wave span{display:inline-block;width:3px;border-radius:2px;background:var(--blue-mid);opacity:.7}
+.note-item.active .note-wave span{background:var(--blue);opacity:1}
+.nplay{width:28px;height:28px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.note-item.active .nplay{background:var(--blue)}
+.nplay svg{width:14px;height:14px;fill:var(--g600)}
+.note-item.active .nplay svg{fill:white}
+
+/* Collabs */
+.collab-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-md);border:1px solid var(--g200);margin-bottom:8px;background:white}
+.collab-av{width:32px;height:32px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--blue);flex-shrink:0}
+.collab-info{flex:1;min-width:0}
+.collab-name{font-size:14px;font-weight:500}
+.collab-link{font-size:11px;color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.copy-btn{background:none;border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;color:var(--g600);font-family:inherit;flex-shrink:0}
+.copy-btn:hover{background:var(--g100)}
+
+.divider{height:1px;background:var(--g200);margin:1rem 0}
+.empty{text-align:center;padding:1.5rem 1rem;color:var(--g400);font-size:14px}
+.export-note{font-size:12px;color:var(--g600);margin-top:8px;line-height:1.5}
+
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a18;color:white;padding:10px 18px;border-radius:var(--r-md);font-size:13px;opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-.empty{text-align:center;padding:2rem 1rem;color:var(--g400);font-size:14px}
-.divider{height:1px;background:var(--g200);margin:1rem 0}
-
 @media(prefers-color-scheme:dark){
-  :root{--g100:#1e1e1c;--g200:#2e2e2b;--g300:#3e3e3a;--g400:#888780;--g600:#b4b2a9;--g900:#f5f4f0;--blue-light:#0c1e30;--coral-light:#2a1410;--coral-border:#7a3a22;--coral-dark:#f0997b}
-  .card,.login-card,.note-item,.episode-row,.folder-row,.collab-row{background:#1a1a18}
-  input[type=text],input[type=password],select{background:#1a1a18;color:var(--g900)}
+  :root{--g100:#1e1e1c;--g200:#2e2e2b;--g400:#888780;--g600:#b4b2a9;--g900:#f5f4f0;--blue-light:#0c1e30;--coral-light:#2a1410;--coral-border:#7a3a22;--coral-dark:#f0997b}
+  .card,.login-card,.folder-row,.ep-row,.note-item,.collab-row{background:#1a1a18}
   .tab.active{background:#2e2e2b}
-  .play-btn{box-shadow:0 4px 16px rgba(24,95,165,.4)}
-  .progress-thumb{border-color:#1a1a18}
-  .note-dot{border-color:#1a1a18}
+  input[type=text],input[type=password]{background:#1a1a18;color:var(--g900)}
+  .prog-thumb{border-color:#1a1a18}
+  .ndot{border-color:#1a1a18}
 }
 </style>
 </head>
 <body>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- LOGIN -->
+<!-- ── LOGIN ── -->
 <div id="login-view">
   <div class="login-card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem">
@@ -176,14 +155,14 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="login-password" placeholder="Enter producer password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="login-pw" placeholder="Enter producer password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn btn-primary btn-full" onclick="doLogin()">Sign in</button>
-    <div class="error-msg" id="login-error">Incorrect password. Try again.</div>
+    <div class="err" id="login-err">Incorrect password.</div>
   </div>
 </div>
 
-<!-- PRODUCER APP -->
+<!-- ── PRODUCER ── -->
 <div id="producer-view" style="display:none">
   <div class="app">
     <div class="header">
@@ -193,178 +172,138 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
     </div>
 
     <div class="tabs">
-      <button class="tab active" onclick="showTab('episodes')">Episodes</button>
-      <button class="tab" onclick="showTab('collaborators')">Collaborators</button>
+      <button class="tab active" id="tab-ep-btn" onclick="showTab('episodes')">Episodes</button>
+      <button class="tab" id="tab-co-btn" onclick="showTab('collabs')">Collaborators</button>
     </div>
 
-    <!-- EPISODES TAB -->
+    <!-- Episodes tab -->
     <div id="tab-episodes">
-      <!-- Folder view -->
-      <div id="producer-folders-view">
+      <!-- Folders -->
+      <div id="p-folders">
         <div class="card">
-          <div class="card-title">Folders</div>
-          <div id="producer-folders-list"><div class="empty">No episodes yet. Upload one below.</div></div>
+          <div class="card-title">Your episodes</div>
+          <div id="p-folders-list"><div class="empty">No episodes yet.</div></div>
         </div>
         <div class="card">
-          <div class="card-title">Upload episode</div>
-          <div class="form-group">
-            <label>Episode title</label>
-            <input type="text" id="upload-title" placeholder="e.g. TAE for Plantar Heel Pain — Draft 1">
-          </div>
-          <div class="form-group">
-            <label>Folder</label>
-            <input type="text" id="upload-folder" placeholder="e.g. Wysdom Radio Season 1">
-          </div>
-          <div class="upload-zone" onclick="document.getElementById('upload-file').click()">
+          <div class="card-title">Upload new episode</div>
+          <div class="form-group"><label>Title</label><input type="text" id="up-title" placeholder="e.g. TAE for Plantar Heel Pain — Draft 1"></div>
+          <div class="form-group"><label>Folder</label><input type="text" id="up-folder" placeholder="e.g. Wysdom Radio Season 1"></div>
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('up-file').click()">
             <svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
             <h3>Choose file</h3>
             <p>MP4, MP3, M4A, WAV</p>
           </div>
-          <input type="file" id="upload-file" accept="audio/*,video/*" style="display:none" onchange="handleUpload(this)">
-          <div class="progress-bar-wrap" id="upload-progress-wrap">
-            <div class="progress-bar-fill" id="upload-progress-fill"></div>
-          </div>
+          <input type="file" id="up-file" accept="audio/*,video/*" style="display:none" onchange="handleUpload(this)">
+          <div class="prog-wrap" id="up-prog-wrap"><div class="prog-fill" id="up-prog-fill"></div></div>
+          <div class="upload-status" id="up-status"></div>
         </div>
       </div>
 
-      <!-- Episode list inside folder -->
-      <div id="producer-episodes-view" style="display:none">
-        <button class="back-btn" onclick="showFolders('producer')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-          Back to folders
-        </button>
+      <!-- Episode list -->
+      <div id="p-eplist" style="display:none">
+        <button class="back-btn" onclick="pShowFolders()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>All folders</button>
         <div class="card">
-          <div class="card-title" id="producer-folder-title">Folder</div>
-          <div id="producer-episodes-list"></div>
+          <div class="card-title" id="p-folder-label"></div>
+          <div id="p-ep-items"></div>
         </div>
       </div>
 
-      <!-- Episode player (producer) -->
-      <div id="producer-player-view" style="display:none">
-        <button class="back-btn" id="producer-back-to-folder" onclick="backToFolderFromPlayer('producer')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-          Back
-        </button>
+      <!-- Player (producer) -->
+      <div id="p-player" style="display:none">
+        <button class="back-btn" onclick="pBackToList()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
         <div class="card">
-          <div class="player-header">
-            <div class="player-title" id="producer-player-title"></div>
-            <div class="player-meta" id="producer-player-meta"></div>
-          </div>
-          <div class="progress-area" id="producer-progress-area">
-            <div class="progress-track" id="producer-progress-track">
-              <div class="progress-fill" id="producer-progress-fill"></div>
+          <div class="player-title" id="p-ep-title"></div>
+          <div class="player-sub" id="p-ep-sub"></div>
+          <div class="prog-area" id="p-prog-area">
+            <div class="prog-track" id="p-prog-track">
+              <div class="prog-bar" id="p-prog-bar"></div>
             </div>
-            <div class="progress-thumb" id="producer-progress-thumb"></div>
+            <div class="prog-thumb" id="p-prog-thumb"></div>
           </div>
-          <div class="time-row">
-            <span id="producer-time-cur">0:00</span>
-            <span id="producer-time-dur">0:00</span>
-          </div>
+          <div class="time-row"><span id="p-cur">0:00</span><span id="p-dur">0:00</span></div>
           <div class="controls">
-            <button class="speed-btn" onclick="cycleSpeed('producer')">1×</button>
-            <button class="play-btn" onclick="togglePlay('producer')">
-              <svg id="producer-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
-            </button>
+            <button class="speed-btn" id="p-speed-btn" onclick="cycleSpeed('p')">1×</button>
+            <button class="play-btn" onclick="togglePlay('p')"><svg id="p-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></button>
             <div style="width:52px"></div>
           </div>
         </div>
-        <div class="card" id="producer-notes-card">
+        <div class="card">
           <div class="card-title">Voice notes</div>
-          <div id="producer-notes-list"><div class="empty">No voice notes yet.</div></div>
-          <div class="export-section">
-            <div class="divider"></div>
-            <button class="btn btn-primary btn-full" onclick="exportMergedAudio()" id="export-btn">Export merged audio</button>
-            <p class="export-note">Downloads an MP4 with the original audio and all voice notes spliced in at their timestamps.</p>
-          </div>
+          <div id="p-notes-list"><div class="empty">No voice notes yet.</div></div>
+          <div class="divider"></div>
+          <button class="btn btn-primary btn-full" id="export-btn" onclick="exportAudio()">Export merged audio</button>
+          <p class="export-note">Downloads a WAV with original audio and all voice notes spliced in at their timestamps.</p>
         </div>
       </div>
     </div>
 
-    <!-- COLLABORATORS TAB -->
-    <div id="tab-collaborators" style="display:none">
+    <!-- Collabs tab -->
+    <div id="tab-collabs" style="display:none">
       <div class="card">
         <div class="card-title">Add collaborator</div>
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" id="collab-name" placeholder="e.g. Dr. Hoffman">
-        </div>
-        <button class="btn btn-primary" onclick="addCollaborator()">Generate link</button>
+        <div class="form-group"><label>Name</label><input type="text" id="co-name" placeholder="e.g. Dr. Hoffman" onkeydown="if(event.key==='Enter')addCollab()"></div>
+        <button class="btn btn-primary" onclick="addCollab()">Generate link</button>
+        <div class="err" id="co-err" style="margin-top:8px"></div>
       </div>
       <div class="card">
         <div class="card-title">Active collaborators</div>
-        <div id="collabs-list"><div class="empty">No collaborators yet.</div></div>
+        <div id="co-list"><div class="empty">No collaborators yet.</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- REVIEWER APP -->
+<!-- ── REVIEWER ── -->
 <div id="reviewer-view" style="display:none">
   <div class="app">
     <div class="header">
       <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
-      <div class="header-text"><h1>Wysdom reviewer</h1><p id="reviewer-greeting">Welcome</p></div>
+      <div class="header-text"><h1>Wysdom reviewer</h1><p id="r-greeting">Welcome</p></div>
     </div>
 
-    <!-- Reviewer folder view -->
-    <div id="reviewer-folders-view">
+    <!-- Folders -->
+    <div id="r-folders">
       <div class="card">
         <div class="card-title">Episodes</div>
-        <div id="reviewer-folders-list"><div class="empty">No episodes available yet.</div></div>
+        <div id="r-folders-list"><div class="empty">No episodes yet.</div></div>
       </div>
     </div>
 
-    <!-- Reviewer episode list -->
-    <div id="reviewer-episodes-view" style="display:none">
-      <button class="back-btn" onclick="showFolders('reviewer')">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to folders
-      </button>
+    <!-- Episode list -->
+    <div id="r-eplist" style="display:none">
+      <button class="back-btn" onclick="rShowFolders()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>All folders</button>
       <div class="card">
-        <div class="card-title" id="reviewer-folder-title">Folder</div>
-        <div id="reviewer-episodes-list"></div>
+        <div class="card-title" id="r-folder-label"></div>
+        <div id="r-ep-items"></div>
       </div>
     </div>
 
-    <!-- Reviewer player -->
-    <div id="reviewer-player-view" style="display:none">
-      <button class="back-btn" id="reviewer-back-to-folder" onclick="backToFolderFromPlayer('reviewer')">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        Back
-      </button>
+    <!-- Player (reviewer) -->
+    <div id="r-player" style="display:none">
+      <button class="back-btn" onclick="rBackToList()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
       <div class="card">
-        <div class="player-header">
-          <div class="player-title" id="reviewer-player-title"></div>
-          <div class="player-meta">Tap the mic to leave a voice note</div>
-        </div>
-        <div class="progress-area" id="reviewer-progress-area">
-          <div class="progress-track" id="reviewer-progress-track">
-            <div class="progress-fill" id="reviewer-progress-fill"></div>
+        <div class="player-title" id="r-ep-title"></div>
+        <div class="player-sub">Tap the mic to leave a voice note — audio pauses while you speak</div>
+        <div class="prog-area" id="r-prog-area">
+          <div class="prog-track" id="r-prog-track">
+            <div class="prog-bar" id="r-prog-bar"></div>
           </div>
-          <div class="progress-thumb" id="reviewer-progress-thumb"></div>
+          <div class="prog-thumb" id="r-prog-thumb"></div>
         </div>
-        <div class="time-row">
-          <span id="reviewer-time-cur">0:00</span>
-          <span id="reviewer-time-dur">0:00</span>
-        </div>
+        <div class="time-row"><span id="r-cur">0:00</span><span id="r-dur">0:00</span></div>
         <div class="controls">
-          <button class="speed-btn" onclick="cycleSpeed('reviewer')">1×</button>
-          <button class="play-btn" onclick="togglePlay('reviewer')">
-            <svg id="reviewer-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
-          </button>
-          <button class="mic-btn" id="reviewer-mic-btn" onclick="toggleRecord()">
+          <button class="speed-btn" id="r-speed-btn" onclick="cycleSpeed('r')">1×</button>
+          <button class="play-btn" onclick="togglePlay('r')"><svg id="r-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></button>
+          <button class="mic-btn" id="mic-btn" onclick="toggleRecord()">
             <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
           </button>
         </div>
-        <div class="rec-banner" id="rec-banner">
-          <div class="rec-dot"></div>
-          <span>Recording… tap mic again to save</span>
-        </div>
-        <p class="mic-hint">Tap the mic to drop a voice note — audio pauses while you speak</p>
+        <div class="rec-banner" id="rec-banner"><div class="rec-dot"></div><span>Recording… tap mic again to save</span></div>
+        <p class="mic-hint">Tap the mic to drop a voice note at this moment</p>
       </div>
       <div class="card">
         <div class="card-title">Your notes</div>
-        <div id="reviewer-notes-list"><div class="empty">No notes yet — hit the mic while listening</div></div>
+        <div id="r-notes-list"><div class="empty">No notes yet — hit the mic while listening</div></div>
       </div>
     </div>
   </div>
@@ -373,66 +312,69 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 <audio id="main-audio" style="display:none"></audio>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────
+// ── CONFIG ──────────────────────────────────────
 const SUPABASE_URL = 'https://osghkfbigroxxxinkdgb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zZ2hrZmJpZ3JveHh4aW5rZGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMzU1MzMsImV4cCI6MjA5NzgxMTUzM30.n8LALQm8p6AuQjvjPk0p0su_FZ-Hyafc6Qw8rWHla9M';
-const PRODUCER_PASSWORD = 'hofmann';
-// Change PRODUCER_PASSWORD to whatever you want before hosting
+const PRODUCER_PW = 'wysdom2026'; // change before hosting
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── STATE ───────────────────────────────────────────────
-let currentRole = null; // 'producer' | 'reviewer'
-let currentCollaborator = null;
+// ── STATE ───────────────────────────────────────
+let role = null;
+let collaborator = null;
 let currentFolder = null;
-let currentEpisode = null;
-let episodes = [];
+let currentFolderEps = [];
+let currentEp = null;
 let notes = [];
-let activeNoteIdx = -1;
+let activeNote = -1;
 let noteAudio = null;
 let recorder = null;
-let isRecording = false;
-let chunks = [];
+let isRec = false;
+let recChunks = [];
 let speeds = [1, 1.5, 2, 2.5];
-let speedIdxP = 0, speedIdxR = 0;
+let pSpeed = 0, rSpeed = 0;
 const audio = document.getElementById('main-audio');
-const waveH = [6,10,18,14,22,16,9,20,13,11,17,8,15,20,11,14,7,19,12,16];
+const WH = [6,10,18,14,22,16,9,20,13,11,17,8,15,20,11,14,7,19,12,16];
 
-// ── INIT ────────────────────────────────────────────────
+// ── BOOT ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  const params = new URLSearchParams(location.search);
-  const token = params.get('reviewer');
+  const token = new URLSearchParams(location.search).get('reviewer');
   if (token) {
-    const { data } = await sb.from('collaborators').select('*').eq('token', token).single();
+    const { data, error } = await sb.from('collaborators').select('*').eq('token', token).maybeSingle();
+    if (error) { toast('Error loading reviewer: ' + error.message); return; }
     if (data) {
-      currentCollaborator = data;
-      currentRole = 'reviewer';
-      document.getElementById('login-view').style.display = 'none';
-      document.getElementById('reviewer-view').style.display = 'block';
-      document.getElementById('reviewer-greeting').textContent = 'Hi, ' + data.name;
-      loadReviewerFolders();
+      collaborator = data;
+      role = 'reviewer';
+      show('reviewer-view');
+      hide('login-view');
+      document.getElementById('r-greeting').textContent = 'Hi, ' + data.name;
+      rLoadFolders();
     } else {
-      showToast('Invalid reviewer link.');
+      toast('Invalid reviewer link.');
     }
   } else {
-    // Check session
-    const saved = sessionStorage.getItem('wysdom-auth');
-    if (saved === PRODUCER_PASSWORD) {
-      showProducer();
-    }
+    if (sessionStorage.getItem('wysdom-auth') === PRODUCER_PW) enterProducer();
   }
 });
 
-// ── AUTH ────────────────────────────────────────────────
+// ── AUTH ────────────────────────────────────────
 function doLogin() {
-  const pw = document.getElementById('login-password').value;
-  if (pw === PRODUCER_PASSWORD) {
+  const pw = document.getElementById('login-pw').value;
+  if (pw === PRODUCER_PW) {
     sessionStorage.setItem('wysdom-auth', pw);
-    document.getElementById('login-error').style.display = 'none';
-    showProducer();
+    document.getElementById('login-err').style.display = 'none';
+    enterProducer();
   } else {
-    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-err').style.display = 'block';
   }
+}
+
+function enterProducer() {
+  role = 'producer';
+  hide('login-view');
+  show('producer-view');
+  pLoadFolders();
+  loadCollabs();
 }
 
 function logout() {
@@ -440,508 +382,491 @@ function logout() {
   location.reload();
 }
 
-function showProducer() {
-  currentRole = 'producer';
-  document.getElementById('login-view').style.display = 'none';
-  document.getElementById('producer-view').style.display = 'block';
-  loadProducerFolders();
-  loadCollaborators();
+// ── TABS ────────────────────────────────────────
+function showTab(t) {
+  const isEp = t === 'episodes';
+  document.getElementById('tab-ep-btn').classList.toggle('active', isEp);
+  document.getElementById('tab-co-btn').classList.toggle('active', !isEp);
+  document.getElementById('tab-episodes').style.display = isEp ? 'block' : 'none';
+  document.getElementById('tab-collabs').style.display = isEp ? 'none' : 'block';
 }
 
-// ── TABS ────────────────────────────────────────────────
-function showTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='episodes')||(i===1&&tab==='collaborators')));
-  document.getElementById('tab-episodes').style.display = tab==='episodes'?'block':'none';
-  document.getElementById('tab-collaborators').style.display = tab==='collaborators'?'block':'none';
-}
-
-// ── FOLDERS ─────────────────────────────────────────────
+// ── SHARED: folder rendering ─────────────────────
 function groupByFolder(eps) {
-  const map = {};
-  eps.forEach(e => {
-    const f = e.folder || 'Uncategorized';
-    if (!map[f]) map[f] = [];
-    map[f].push(e);
-  });
-  return map;
+  const m = {};
+  eps.forEach(e => { const f = e.folder||'Uncategorized'; if(!m[f])m[f]=[]; m[f].push(e); });
+  return m;
 }
 
-async function loadProducerFolders() {
-  const { data } = await sb.from('episodes').select('*').order('created_at', { ascending: false });
-  episodes = data || [];
-  renderFolders('producer', episodes);
+function folderHTML(name, count) {
+  return `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    <span class="folder-name">${name}</span>
+    <span class="folder-count">${count} episode${count!==1?'s':''}</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`;
 }
 
-async function loadReviewerFolders() {
-  const { data } = await sb.from('episodes').select('*').order('created_at', { ascending: false });
-  episodes = data || [];
-  renderFolders('reviewer', episodes);
-}
-
-function renderFolders(role, eps) {
+// ── PRODUCER: folders ────────────────────────────
+async function pLoadFolders() {
+  const { data, error } = await sb.from('episodes').select('*').order('created_at', { ascending: false });
+  if (error) { toast('Error loading episodes: ' + error.message); return; }
+  const eps = data || [];
+  const list = document.getElementById('p-folders-list');
+  if (!eps.length) { list.innerHTML = '<div class="empty">No episodes yet. Upload one below.</div>'; return; }
   const map = groupByFolder(eps);
-  const listEl = document.getElementById(role + '-folders-list');
-  if (Object.keys(map).length === 0) {
-    listEl.innerHTML = '<div class="empty">No episodes yet.</div>';
-    return;
-  }
-  listEl.innerHTML = '';
+  list.innerHTML = '';
   Object.entries(map).forEach(([folder, items]) => {
-    const div = document.createElement('div');
-    div.className = 'folder-row';
-    div.innerHTML = `
-      <svg class="folder-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      <span class="folder-name">${folder}</span>
-      <span class="folder-count">${items.length} episode${items.length!==1?'s':''}</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    `;
-    div.onclick = () => openFolder(role, folder, items);
-    listEl.appendChild(div);
+    const d = document.createElement('div');
+    d.className = 'folder-row';
+    d.innerHTML = folderHTML(folder, items.length);
+    d.onclick = () => pOpenFolder(folder, items);
+    list.appendChild(d);
   });
 }
 
-function openFolder(role, folder, items) {
-  currentFolder = { name: folder, items };
-  document.getElementById(role + '-folders-view').style.display = 'none';
-  document.getElementById(role + '-episodes-view').style.display = 'block';
-  document.getElementById(role + '-folder-title').textContent = folder;
-  renderEpisodesList(role, items);
+function pOpenFolder(folder, items) {
+  currentFolder = folder;
+  currentFolderEps = items;
+  hide('p-folders');
+  show('p-eplist');
+  document.getElementById('p-folder-label').textContent = folder;
+  pRenderEpList(items);
 }
 
-async function renderEpisodesList(role, items) {
-  const listEl = document.getElementById(role + '-episodes-list');
-  listEl.innerHTML = '';
+async function pRenderEpList(items) {
+  const list = document.getElementById('p-ep-items');
+  list.innerHTML = '';
   for (const ep of items) {
     const { count } = await sb.from('voice_notes').select('*', { count: 'exact', head: true }).eq('episode_id', ep.id);
-    const div = document.createElement('div');
-    div.className = 'episode-row';
-    div.innerHTML = `
+    const d = document.createElement('div');
+    d.className = 'ep-row';
+    d.innerHTML = `
       <div class="ep-icon"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
-      <div class="ep-info">
-        <div class="ep-title">${ep.title}</div>
-        <div class="ep-meta">${ep.folder}</div>
-      </div>
-      ${count > 0 ? `<span class="ep-notes-badge">${count} note${count!==1?'s':''}</span>` : ''}
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    `;
-    div.onclick = () => openEpisode(role, ep);
-    listEl.appendChild(div);
+      <div class="ep-info"><div class="ep-title">${ep.title}</div><div class="ep-sub">${ep.folder}</div></div>
+      ${count > 0 ? `<span class="badge">${count} note${count!==1?'s':''}</span>` : ''}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+    d.onclick = () => openEpisode('p', ep);
+    list.appendChild(d);
   }
 }
 
-function showFolders(role) {
-  document.getElementById(role + '-episodes-view').style.display = 'none';
-  document.getElementById(role + '-folders-view').style.display = 'block';
-  currentFolder = null;
-  stopAudio();
+function pShowFolders() { hide('p-eplist'); show('p-folders'); stopAudio(); }
+function pBackToList() { hide('p-player'); show('p-eplist'); stopAudio(); pRenderEpList(currentFolderEps); }
+
+// ── REVIEWER: folders ────────────────────────────
+async function rLoadFolders() {
+  const { data, error } = await sb.from('episodes').select('*').order('created_at', { ascending: false });
+  if (error) { toast('Error loading episodes: ' + error.message); return; }
+  const eps = data || [];
+  const list = document.getElementById('r-folders-list');
+  if (!eps.length) { list.innerHTML = '<div class="empty">No episodes available yet.</div>'; return; }
+  const map = groupByFolder(eps);
+  list.innerHTML = '';
+  Object.entries(map).forEach(([folder, items]) => {
+    const d = document.createElement('div');
+    d.className = 'folder-row';
+    d.innerHTML = folderHTML(folder, items.length);
+    d.onclick = () => rOpenFolder(folder, items);
+    list.appendChild(d);
+  });
 }
 
-function backToFolderFromPlayer(role) {
-  document.getElementById(role + '-player-view').style.display = 'none';
-  document.getElementById(role + '-episodes-view').style.display = 'block';
-  stopAudio();
-  if (currentFolder) renderEpisodesList(role, currentFolder.items);
+function rOpenFolder(folder, items) {
+  currentFolder = folder;
+  currentFolderEps = items;
+  hide('r-folders');
+  show('r-eplist');
+  document.getElementById('r-folder-label').textContent = folder;
+  rRenderEpList(items);
 }
 
-// ── EPISODE / PLAYER ─────────────────────────────────────
-async function openEpisode(role, ep) {
-  currentEpisode = ep;
+function rRenderEpList(items) {
+  const list = document.getElementById('r-ep-items');
+  list.innerHTML = '';
+  items.forEach(ep => {
+    const d = document.createElement('div');
+    d.className = 'ep-row';
+    d.innerHTML = `
+      <div class="ep-icon"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+      <div class="ep-info"><div class="ep-title">${ep.title}</div><div class="ep-sub">${ep.folder}</div></div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+    d.onclick = () => openEpisode('r', ep);
+    list.appendChild(d);
+  });
+}
+
+function rShowFolders() { hide('r-eplist'); show('r-folders'); stopAudio(); }
+function rBackToList() { hide('r-player'); show('r-eplist'); stopAudio(); rRenderEpList(currentFolderEps); }
+
+// ── PLAYER ──────────────────────────────────────
+async function openEpisode(prefix, ep) {
+  currentEp = ep;
   notes = [];
-  activeNoteIdx = -1;
+  activeNote = -1;
   if (noteAudio) { noteAudio.pause(); noteAudio = null; }
 
-  document.getElementById(role + '-episodes-view').style.display = 'none';
-  document.getElementById(role + '-player-view').style.display = 'block';
-  document.getElementById(role + '-player-title').textContent = ep.title;
+  if (prefix === 'p') { hide('p-eplist'); show('p-player'); document.getElementById('p-ep-title').textContent = ep.title; document.getElementById('p-ep-sub').textContent = ep.folder; }
+  else { hide('r-eplist'); show('r-player'); document.getElementById('r-ep-title').textContent = ep.title; }
 
-  const { data: url } = sb.storage.from('episodes').getPublicUrl(ep.file_path);
-  audio.src = url.publicUrl;
-  audio.playbackRate = role === 'producer' ? speeds[speedIdxP] : speeds[speedIdxR];
+  const { data: urlData } = sb.storage.from('episodes').getPublicUrl(ep.file_path);
+  audio.src = urlData.publicUrl;
+  audio.playbackRate = prefix === 'p' ? speeds[pSpeed] : speeds[rSpeed];
   audio.load();
 
-  resetPlayIcon(role);
-  resetProgress(role);
+  setPlayIcon(prefix, 'play');
+  setProgress(prefix, 0, 0);
 
-  audio.onloadedmetadata = () => {
-    document.getElementById(role + '-time-dur').textContent = fmt(audio.duration);
+  audio.onloadedmetadata = () => { document.getElementById(prefix + '-dur').textContent = fmt(audio.duration); };
+  audio.ontimeupdate = () => {
+    if (!audio.duration) return;
+    const pct = audio.currentTime / audio.duration * 100;
+    document.getElementById(prefix + '-prog-bar').style.width = pct + '%';
+    document.getElementById(prefix + '-prog-thumb').style.left = pct + '%';
+    document.getElementById(prefix + '-cur').textContent = fmt(audio.currentTime);
+    renderDots(prefix);
   };
-  audio.ontimeupdate = () => updateProgress(role);
-  audio.onended = () => resetPlayIcon(role);
+  audio.onended = () => setPlayIcon(prefix, 'play');
 
-  document.getElementById(role + '-progress-area').onclick = e => {
-    const rect = document.getElementById(role + '-progress-track').getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    audio.currentTime = pct * (audio.duration || 0);
+  document.getElementById(prefix + '-prog-area').onclick = e => {
+    const rect = document.getElementById(prefix + '-prog-track').getBoundingClientRect();
+    audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * (audio.duration || 0);
   };
 
-  await loadNotes(role, ep.id);
-  if (role === 'producer') {
-    document.getElementById('producer-player-meta').textContent = ep.folder;
-  }
+  await loadNotes(prefix);
 }
 
 function stopAudio() {
-  audio.pause();
-  audio.src = '';
+  audio.pause(); audio.src = '';
   if (noteAudio) { noteAudio.pause(); noteAudio = null; }
-  isRecording = false;
-  if (recorder && recorder.state !== 'inactive') recorder.stop();
+  isRec = false;
+  if (recorder && recorder.state !== 'inactive') try { recorder.stop(); } catch(e) {}
+  document.getElementById('rec-banner').classList.remove('on');
+  document.getElementById('mic-btn').classList.remove('recording');
 }
 
-function resetPlayIcon(role) {
-  document.getElementById(role + '-play-icon').innerHTML = '<path d="M5 3l14 9-14 9V3z"/>';
+function togglePlay(prefix) {
+  if (audio.paused) { audio.play(); setPlayIcon(prefix, 'pause'); }
+  else { audio.pause(); setPlayIcon(prefix, 'play'); }
 }
 
-function resetProgress(role) {
-  document.getElementById(role + '-progress-fill').style.width = '0%';
-  document.getElementById(role + '-progress-thumb').style.left = '0%';
-  document.getElementById(role + '-time-cur').textContent = '0:00';
+function cycleSpeed(prefix) {
+  if (prefix === 'p') { pSpeed = (pSpeed + 1) % speeds.length; audio.playbackRate = speeds[pSpeed]; document.getElementById('p-speed-btn').textContent = speeds[pSpeed] + '×'; }
+  else { rSpeed = (rSpeed + 1) % speeds.length; audio.playbackRate = speeds[rSpeed]; document.getElementById('r-speed-btn').textContent = speeds[rSpeed] + '×'; }
 }
 
-function updateProgress(role) {
-  if (!audio.duration) return;
-  const pct = (audio.currentTime / audio.duration) * 100;
-  document.getElementById(role + '-progress-fill').style.width = pct + '%';
-  document.getElementById(role + '-progress-thumb').style.left = pct + '%';
-  document.getElementById(role + '-time-cur').textContent = fmt(audio.currentTime);
-  renderNoteDots(role);
+function setPlayIcon(prefix, state) {
+  document.getElementById(prefix + '-play-icon').innerHTML = state === 'play'
+    ? '<path d="M5 3l14 9-14 9V3z"/>'
+    : '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
 }
 
-function togglePlay(role) {
-  if (audio.paused) {
-    audio.play();
-    document.getElementById(role + '-play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-  } else {
-    audio.pause();
-    resetPlayIcon(role);
-  }
+function setProgress(prefix, cur, dur) {
+  document.getElementById(prefix + '-prog-bar').style.width = '0%';
+  document.getElementById(prefix + '-prog-thumb').style.left = '0%';
+  document.getElementById(prefix + '-cur').textContent = fmt(cur);
+  document.getElementById(prefix + '-dur').textContent = fmt(dur);
 }
 
-function cycleSpeed(role) {
-  if (role === 'producer') {
-    speedIdxP = (speedIdxP + 1) % speeds.length;
-    audio.playbackRate = speeds[speedIdxP];
-    document.querySelector('#tab-episodes .speed-btn') && null;
-    document.querySelectorAll('.speed-btn').forEach(b => { if(b.closest('#producer-view')) b.textContent = speeds[speedIdxP] + '×'; });
-  } else {
-    speedIdxR = (speedIdxR + 1) % speeds.length;
-    audio.playbackRate = speeds[speedIdxR];
-    document.querySelectorAll('.speed-btn').forEach(b => { if(b.closest('#reviewer-view')) b.textContent = speeds[speedIdxR] + '×'; });
-  }
-}
-
-// ── NOTES ───────────────────────────────────────────────
-async function loadNotes(role, episodeId) {
-  const { data } = await sb.from('voice_notes')
+// ── NOTES ───────────────────────────────────────
+async function loadNotes(prefix) {
+  const { data, error } = await sb.from('voice_notes')
     .select('*, collaborators(name)')
-    .eq('episode_id', episodeId)
+    .eq('episode_id', currentEp.id)
     .order('timestamp_sec');
+  if (error) { toast('Error loading notes: ' + error.message); return; }
   notes = data || [];
-  renderNotesList(role);
-  renderNoteDots(role);
+  renderNotes(prefix);
+  renderDots(prefix);
 }
 
-function renderNoteDots(role) {
-  const track = document.getElementById(role + '-progress-track');
-  if (!track) return;
-  track.querySelectorAll('.note-dot').forEach(d => d.remove());
-  if (!audio.duration) return;
+function renderDots(prefix) {
+  const track = document.getElementById(prefix + '-prog-track');
+  if (!track || !audio.duration) return;
+  track.querySelectorAll('.ndot').forEach(d => d.remove());
   notes.forEach((n, i) => {
     const dot = document.createElement('div');
-    dot.className = 'note-dot';
-    dot.style.left = ((n.timestamp_sec / audio.duration) * 100) + '%';
+    dot.className = 'ndot';
+    dot.style.left = (n.timestamp_sec / audio.duration * 100) + '%';
     dot.title = fmt(n.timestamp_sec);
-    dot.addEventListener('click', e => { e.stopPropagation(); playNote(i); });
+    dot.addEventListener('click', e => { e.stopPropagation(); playNote(i, prefix); });
     track.appendChild(dot);
   });
 }
 
-function renderNotesList(role) {
-  const listId = role + '-notes-list';
-  const listEl = document.getElementById(listId);
-  if (!listEl) return;
-  if (notes.length === 0) {
-    listEl.innerHTML = '<div class="empty">No notes yet.</div>';
-    return;
-  }
-  listEl.innerHTML = '';
+function renderNotes(prefix) {
+  const listId = prefix === 'p' ? 'p-notes-list' : 'r-notes-list';
+  const el = document.getElementById(listId);
+  if (!el) return;
+  if (!notes.length) { el.innerHTML = '<div class="empty">No notes yet.</div>'; return; }
+  el.innerHTML = '';
   notes.forEach((n, i) => {
-    const isActive = activeNoteIdx === i;
-    const who = n.collaborators?.name || 'Unknown';
-    const { data: urlObj } = sb.storage.from('notes').getPublicUrl(n.file_path);
+    const active = activeNote === i;
+    const who = n.collaborators?.name || '';
     const item = document.createElement('div');
-    item.className = 'note-item' + (isActive ? ' active' : '');
-    item.id = 'note-' + i;
+    item.className = 'note-item' + (active ? ' active' : '');
+    item.id = 'ni-' + i;
     item.innerHTML = `
       <span class="note-ts">${fmt(n.timestamp_sec)}</span>
-      <span class="note-who">${who}</span>
-      <div class="note-wave" aria-hidden="true">${waveH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>
-      <div class="note-play-icon">
-        <svg viewBox="0 0 24 24" id="nplay-${i}">
-          ${isActive ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}
-        </svg>
-      </div>
-    `;
-    item.onclick = () => playNote(i);
-    listEl.appendChild(item);
+      ${who ? `<span class="note-who">${who}</span>` : ''}
+      <div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>
+      <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>`;
+    item.onclick = () => playNote(i, prefix);
+    el.appendChild(item);
   });
 }
 
-function playNote(i) {
+function playNote(i, prefix) {
   if (noteAudio) { noteAudio.pause(); noteAudio = null; }
-  if (activeNoteIdx === i) { activeNoteIdx = -1; renderNotesList(currentRole); return; }
-  activeNoteIdx = i;
+  if (activeNote === i) { activeNote = -1; renderNotes(prefix); return; }
+  activeNote = i;
   audio.currentTime = notes[i].timestamp_sec;
-  renderNotesList(currentRole);
-  const { data: urlObj } = sb.storage.from('notes').getPublicUrl(notes[i].file_path);
-  noteAudio = new Audio(urlObj.publicUrl);
-  noteAudio.onended = () => { activeNoteIdx = -1; noteAudio = null; renderNotesList(currentRole); };
+  renderNotes(prefix);
+  const { data: urlData } = sb.storage.from('notes').getPublicUrl(notes[i].file_path);
+  noteAudio = new Audio(urlData.publicUrl);
+  noteAudio.onended = () => { activeNote = -1; noteAudio = null; renderNotes(prefix); };
   noteAudio.play();
 }
 
-// ── RECORDING ────────────────────────────────────────────
+// ── RECORDING ───────────────────────────────────
 async function toggleRecord() {
-  if (isRecording) {
-    recorder.stop();
-    return;
-  }
+  if (isRec) { recorder.stop(); return; }
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
-  catch { alert('Microphone access needed. Please allow it in your browser settings.'); return; }
+  catch { toast('Mic access denied. Please allow microphone access.'); return; }
 
   const ts = audio.currentTime;
   audio.pause();
-  resetPlayIcon('reviewer');
+  setPlayIcon('r', 'play');
+  recChunks = [];
 
-  chunks = [];
   recorder = new MediaRecorder(stream);
-  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
   recorder.onstop = async () => {
-    isRecording = false;
-    document.getElementById('reviewer-mic-btn').classList.remove('recording');
-    document.getElementById('rec-banner').classList.remove('visible');
+    isRec = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+    document.getElementById('rec-banner').classList.remove('on');
     stream.getTracks().forEach(t => t.stop());
 
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    const path = `note-${Date.now()}.webm`;
-    showToast('Saving note…');
+    const blob = new Blob(recChunks, { type: 'audio/webm' });
+    const path = `note-${Date.now()}-${Math.random().toString(36).slice(2,8)}.webm`;
+    toast('Saving note…');
+
     const { error: upErr } = await sb.storage.from('notes').upload(path, blob, { contentType: 'audio/webm' });
-    if (upErr) { showToast('Error saving note. Try again.'); return; }
+    if (upErr) { toast('Error saving note: ' + upErr.message); return; }
 
     const { error: dbErr } = await sb.from('voice_notes').insert({
-      episode_id: currentEpisode.id,
-      collaborator_id: currentCollaborator.id,
+      episode_id: currentEp.id,
+      collaborator_id: collaborator.id,
       timestamp_sec: ts,
       file_path: path
     });
-    if (dbErr) { showToast('Error saving note.'); return; }
+    if (dbErr) { toast('Error saving note: ' + dbErr.message); return; }
 
-    showToast('Note saved!');
-    await loadNotes('reviewer', currentEpisode.id);
+    toast('Note saved!');
+    await loadNotes('r');
     audio.play();
-    document.getElementById('reviewer-play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    setPlayIcon('r', 'pause');
   };
 
   recorder.start();
-  isRecording = true;
-  document.getElementById('reviewer-mic-btn').classList.add('recording');
-  document.getElementById('rec-banner').classList.add('visible');
+  isRec = true;
+  document.getElementById('mic-btn').classList.add('recording');
+  document.getElementById('rec-banner').classList.add('on');
 }
 
-// ── UPLOAD ───────────────────────────────────────────────
+// ── UPLOAD ──────────────────────────────────────
 async function handleUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  const title = document.getElementById('upload-title').value.trim() || file.name.replace(/\.[^.]+$/, '');
-  const folder = document.getElementById('upload-folder').value.trim() || 'Uncategorized';
-  const path = `episode-${Date.now()}-${file.name.replace(/\s+/g,'-')}`;
 
-  document.getElementById('upload-progress-wrap').style.display = 'block';
-  document.getElementById('upload-progress-fill').style.width = '10%';
-  showToast('Uploading…');
+  const title = document.getElementById('up-title').value.trim() || file.name.replace(/\.[^.]+$/, '');
+  const folder = document.getElementById('up-folder').value.trim() || 'Uncategorized';
+  const path = `ep-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')}`;
 
-  const { error: upErr } = await sb.storage.from('episodes').upload(path, file, { contentType: file.type });
-  if (upErr) { showToast('Upload failed: ' + upErr.message); return; }
-  document.getElementById('upload-progress-fill').style.width = '80%';
+  const progWrap = document.getElementById('up-prog-wrap');
+  const progFill = document.getElementById('up-prog-fill');
+  const status = document.getElementById('up-status');
+
+  progWrap.style.display = 'block';
+  progFill.style.width = '15%';
+  status.textContent = 'Uploading file…';
+  document.getElementById('upload-zone').style.pointerEvents = 'none';
+
+  const { error: upErr } = await sb.storage.from('episodes').upload(path, file, { contentType: file.type, upsert: false });
+  if (upErr) {
+    toast('Upload failed: ' + upErr.message);
+    status.textContent = 'Upload failed. Try again.';
+    progWrap.style.display = 'none';
+    document.getElementById('upload-zone').style.pointerEvents = '';
+    input.value = '';
+    return;
+  }
+
+  progFill.style.width = '75%';
+  status.textContent = 'Saving episode info…';
 
   const { error: dbErr } = await sb.from('episodes').insert({ title, folder, file_path: path });
-  if (dbErr) { showToast('DB error: ' + dbErr.message); return; }
+  if (dbErr) {
+    toast('Database error: ' + dbErr.message);
+    status.textContent = 'Database error: ' + dbErr.message;
+    progWrap.style.display = 'none';
+    document.getElementById('upload-zone').style.pointerEvents = '';
+    input.value = '';
+    return;
+  }
 
-  document.getElementById('upload-progress-fill').style.width = '100%';
-  setTimeout(() => { document.getElementById('upload-progress-wrap').style.display = 'none'; }, 600);
+  progFill.style.width = '100%';
+  status.textContent = 'Episode uploaded successfully!';
+  setTimeout(() => { progWrap.style.display = 'none'; status.textContent = ''; }, 2000);
 
-  document.getElementById('upload-title').value = '';
-  document.getElementById('upload-folder').value = '';
+  document.getElementById('up-title').value = '';
+  document.getElementById('up-folder').value = '';
+  document.getElementById('upload-zone').style.pointerEvents = '';
   input.value = '';
-  showToast('Episode uploaded!');
-  await loadProducerFolders();
+  toast('Episode uploaded!');
+  await pLoadFolders();
 }
 
-// ── COLLABORATORS ─────────────────────────────────────────
-function genToken() {
-  return Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
-}
-
-async function addCollaborator() {
-  const name = document.getElementById('collab-name').value.trim();
-  if (!name) { showToast('Enter a name first.'); return; }
-  const token = genToken();
-  const { error } = await sb.from('collaborators').insert({ name, token });
-  if (error) { showToast('Error: ' + error.message); return; }
-  document.getElementById('collab-name').value = '';
-  showToast('Collaborator added!');
-  loadCollaborators();
-}
-
-async function loadCollaborators() {
-  const { data } = await sb.from('collaborators').select('*').order('created_at');
-  const listEl = document.getElementById('collabs-list');
-  if (!data || data.length === 0) { listEl.innerHTML = '<div class="empty">No collaborators yet.</div>'; return; }
-  listEl.innerHTML = '';
+// ── COLLABORATORS ────────────────────────────────
+async function loadCollabs() {
+  const { data, error } = await sb.from('collaborators').select('*').order('created_at');
+  const el = document.getElementById('co-list');
+  if (error) { el.innerHTML = '<div class="empty">Error loading collaborators: ' + error.message + '</div>'; return; }
+  if (!data || !data.length) { el.innerHTML = '<div class="empty">No collaborators yet.</div>'; return; }
+  el.innerHTML = '';
   data.forEach(c => {
     const link = location.origin + location.pathname + '?reviewer=' + c.token;
-    const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const div = document.createElement('div');
-    div.className = 'collab-row';
-    div.innerHTML = `
-      <div class="collab-avatar">${initials}</div>
-      <div class="collab-info">
-        <div class="collab-name">${c.name}</div>
-        <div class="collab-link">${link}</div>
-      </div>
-      <button class="copy-btn" onclick="copyLink('${link}')">Copy</button>
-    `;
-    listEl.appendChild(div);
+    const initials = c.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const d = document.createElement('div');
+    d.className = 'collab-row';
+    d.innerHTML = `
+      <div class="collab-av">${initials}</div>
+      <div class="collab-info"><div class="collab-name">${c.name}</div><div class="collab-link">${link}</div></div>
+      <button class="copy-btn" onclick="copyLink('${link}')">Copy</button>`;
+    el.appendChild(d);
   });
 }
 
-function copyLink(link) {
-  navigator.clipboard.writeText(link).then(() => showToast('Link copied!'));
+async function addCollab() {
+  const name = document.getElementById('co-name').value.trim();
+  const errEl = document.getElementById('co-err');
+  errEl.style.display = 'none';
+  if (!name) { errEl.textContent = 'Please enter a name.'; errEl.style.display = 'block'; return; }
+
+  const token = Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
+  const { error } = await sb.from('collaborators').insert({ name, token });
+  if (error) { errEl.textContent = 'Error: ' + error.message; errEl.style.display = 'block'; return; }
+
+  document.getElementById('co-name').value = '';
+  toast('Collaborator added!');
+  loadCollabs();
 }
 
-// ── EXPORT ───────────────────────────────────────────────
-async function exportMergedAudio() {
-  if (!currentEpisode) return;
-  if (notes.length === 0) { showToast('No voice notes to merge.'); return; }
+function copyLink(link) {
+  navigator.clipboard.writeText(link).then(() => toast('Link copied!')).catch(() => {
+    prompt('Copy this link:', link);
+  });
+}
 
-  showToast('Preparing export… this may take a moment.');
-  document.getElementById('export-btn').disabled = true;
-  document.getElementById('export-btn').textContent = 'Preparing…';
+// ── EXPORT ──────────────────────────────────────
+async function exportAudio() {
+  if (!currentEp) return;
+  if (!notes.length) { toast('No voice notes to merge yet.'); return; }
+
+  const btn = document.getElementById('export-btn');
+  btn.disabled = true;
+  btn.textContent = 'Preparing…';
+  toast('Building export… this may take a moment.');
 
   try {
-    const { data: epUrl } = sb.storage.from('episodes').getPublicUrl(currentEpisode.file_path);
-    const epResp = await fetch(epUrl.publicUrl);
-    const epArrayBuffer = await epResp.arrayBuffer();
-
+    const { data: epUrlData } = sb.storage.from('episodes').getPublicUrl(currentEp.file_path);
+    const epResp = await fetch(epUrlData.publicUrl);
+    const epAB = await epResp.arrayBuffer();
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const epDecoded = await ctx.decodeAudioData(epArrayBuffer.slice(0));
+    const epBuf = await ctx.decodeAudioData(epAB);
 
-    const noteBuffers = [];
+    const noteBufs = [];
     for (const n of notes) {
-      const { data: nUrl } = sb.storage.from('notes').getPublicUrl(n.file_path);
-      const nResp = await fetch(nUrl.publicUrl);
-      const nBuf = await nResp.arrayBuffer();
-      const nDecoded = await ctx.decodeAudioData(nBuf);
-      noteBuffers.push({ ts: n.timestamp_sec, buffer: nDecoded });
+      const { data: nUrlData } = sb.storage.from('notes').getPublicUrl(n.file_path);
+      const nResp = await fetch(nUrlData.publicUrl);
+      const nAB = await nResp.arrayBuffer();
+      const nBuf = await ctx.decodeAudioData(nAB);
+      noteBufs.push({ ts: n.timestamp_sec, buf: nBuf });
     }
+    noteBufs.sort((a,b) => a.ts - b.ts);
 
-    noteBuffers.sort((a,b) => a.ts - b.ts);
+    const sr = epBuf.sampleRate;
+    const ch = epBuf.numberOfChannels;
+    let totalSamples = epBuf.length;
+    noteBufs.forEach(n => { totalSamples += n.buf.length; });
 
-    const sr = epDecoded.sampleRate;
-    const ch = epDecoded.numberOfChannels;
-    let totalDur = epDecoded.duration;
-    noteBuffers.forEach(n => { totalDur += n.buffer.duration; });
-
-    const outBuf = ctx.createBuffer(ch, Math.ceil(totalDur * sr), sr);
-
+    const out = ctx.createBuffer(ch, totalSamples, sr);
     let writePos = 0;
     let readPos = 0;
-    const sorted = [...noteBuffers];
 
-    for (let i = 0; i <= sorted.length; i++) {
-      const segEnd = i < sorted.length ? sorted[i].ts : epDecoded.duration;
-      const segLen = Math.min(segEnd - readPos, epDecoded.duration - readPos);
-      if (segLen > 0) {
-        const samples = Math.ceil(segLen * sr);
-        for (let c = 0; c < ch; c++) {
-          const src = epDecoded.getChannelData(c);
-          const dst = outBuf.getChannelData(c);
-          const readSample = Math.floor(readPos * sr);
-          for (let s = 0; s < samples && readSample + s < src.length; s++) {
-            dst[writePos + s] = src[readSample + s];
-          }
-        }
-        writePos += samples;
-        readPos = segEnd;
+    for (let i = 0; i <= noteBufs.length; i++) {
+      const segEndSec = i < noteBufs.length ? noteBufs[i].ts : epBuf.duration;
+      const segStartSample = Math.floor(readPos * sr);
+      const segEndSample = Math.min(Math.floor(segEndSec * sr), epBuf.length);
+      const segLen = Math.max(0, segEndSample - segStartSample);
+      for (let c = 0; c < ch; c++) {
+        const src = epBuf.getChannelData(c);
+        const dst = out.getChannelData(c);
+        for (let s = 0; s < segLen; s++) dst[writePos + s] = src[segStartSample + s];
       }
-      if (i < sorted.length) {
-        const nb = sorted[i].buffer;
-        const nSamples = nb.length;
+      writePos += segLen;
+      readPos = segEndSec;
+
+      if (i < noteBufs.length) {
+        const nb = noteBufs[i].buf;
         for (let c = 0; c < ch; c++) {
           const src = nb.getChannelData(Math.min(c, nb.numberOfChannels - 1));
-          const dst = outBuf.getChannelData(c);
-          for (let s = 0; s < nSamples; s++) {
-            dst[writePos + s] = src[s];
-          }
+          const dst = out.getChannelData(c);
+          for (let s = 0; s < nb.length; s++) dst[writePos + s] = src[s];
         }
-        writePos += nSamples;
+        writePos += nb.length;
       }
     }
 
-    const wavBlob = audioBufferToWav(outBuf);
-    const dlUrl = URL.createObjectURL(wavBlob);
+    const wav = bufToWav(out);
+    const url = URL.createObjectURL(wav);
     const a = document.createElement('a');
-    a.href = dlUrl;
-    a.download = (currentEpisode.title || 'export') + '-reviewed.wav';
-    a.click();
-    showToast('Export ready!');
+    a.href = url; a.download = currentEp.title + '-reviewed.wav'; a.click();
+    toast('Export downloaded!');
   } catch(e) {
+    toast('Export error: ' + e.message);
     console.error(e);
-    showToast('Export failed. See console.');
   }
 
-  document.getElementById('export-btn').disabled = false;
-  document.getElementById('export-btn').textContent = 'Export merged audio';
+  btn.disabled = false;
+  btn.textContent = 'Export merged audio';
 }
 
-function audioBufferToWav(buffer) {
-  const numCh = buffer.numberOfChannels;
-  const sr = buffer.sampleRate;
-  const numFrames = buffer.length;
-  const bytesPerSample = 2;
-  const blockAlign = numCh * bytesPerSample;
-  const byteRate = sr * blockAlign;
-  const dataSize = numFrames * blockAlign;
-  const ab = new ArrayBuffer(44 + dataSize);
-  const view = new DataView(ab);
-  function ws(off,str){for(let i=0;i<str.length;i++)view.setUint8(off+i,str.charCodeAt(i));}
-  ws(0,'RIFF'); view.setUint32(4,36+dataSize,true); ws(8,'WAVE');
-  ws(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,1,true);
-  view.setUint16(22,numCh,true); view.setUint32(24,sr,true);
-  view.setUint32(28,byteRate,true); view.setUint16(32,blockAlign,true);
-  view.setUint16(34,16,true); ws(36,'data'); view.setUint32(40,dataSize,true);
-  let offset = 44;
-  for (let i=0;i<numFrames;i++) {
-    for (let c=0;c<numCh;c++) {
-      const s = Math.max(-1,Math.min(1,buffer.getChannelData(c)[i]));
-      view.setInt16(offset, s<0?s*0x8000:s*0x7FFF, true);
-      offset += 2;
-    }
+function bufToWav(buf) {
+  const nc = buf.numberOfChannels, sr = buf.sampleRate, len = buf.length;
+  const ab = new ArrayBuffer(44 + len * nc * 2);
+  const v = new DataView(ab);
+  const ws = (o,s) => { for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+  ws(0,'RIFF'); v.setUint32(4,36+len*nc*2,true); ws(8,'WAVE');
+  ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,nc,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*nc*2,true); v.setUint16(32,nc*2,true); v.setUint16(34,16,true);
+  ws(36,'data'); v.setUint32(40,len*nc*2,true);
+  let off = 44;
+  for (let i=0;i<len;i++) for(let c=0;c<nc;c++) {
+    const s = Math.max(-1,Math.min(1,buf.getChannelData(c)[i]));
+    v.setInt16(off, s<0?s*0x8000:s*0x7FFF, true); off+=2;
   }
-  return new Blob([ab], { type: 'audio/wav' });
+  return new Blob([ab],{type:'audio/wav'});
 }
 
-// ── UTILS ────────────────────────────────────────────────
-function fmt(s) {
-  s = Math.floor(s||0);
-  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
-}
-
-function showToast(msg) {
+// ── UTILS ───────────────────────────────────────
+function fmt(s) { s=Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function show(id) { document.getElementById(id).style.display='block'; }
+function hide(id) { document.getElementById(id).style.display='none'; }
+function toast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
 </body>
