@@ -89,6 +89,10 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .play-btn{width:64px;height:64px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(24,95,165,.3);transition:transform .1s}
 .play-btn:active{transform:scale(.95)}
 .play-btn svg{width:28px;height:28px;fill:white}
+.skip-btn{width:44px;height:44px;border-radius:50%;background:var(--g100);border:1.5px solid var(--g200);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:inherit;color:var(--g900);transition:background .1s}
+.skip-btn:hover{background:var(--g200)}
+.skip-btn svg{width:17px;height:17px;fill:var(--g900)}
+.skip-btn span{font-size:9px;font-weight:700;line-height:1;letter-spacing:.02em}
 .mic-btn{width:52px;height:52px;border-radius:50%;background:var(--g100);border:1.5px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .mic-btn svg{width:22px;height:22px;stroke:var(--g600);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mic-btn:hover{background:var(--g200)}
@@ -103,18 +107,24 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .mic-hint{text-align:center;font-size:12px;color:var(--g400);margin-top:10px}
 
 /* Notes */
-.note-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);cursor:pointer;margin-bottom:8px;background:white;transition:background .1s,border-color .1s}
+.note-item{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);margin-bottom:8px;background:white;transition:background .1s,border-color .1s}
 .note-item:hover{background:var(--g100)}
 .note-item.active{border-color:var(--blue);background:var(--blue-light)}
+.note-top{display:flex;align-items:center;gap:10px;cursor:pointer}
 .note-ts{font-size:12px;font-weight:600;color:var(--blue);min-width:38px;font-variant-numeric:tabular-nums}
 .note-who{font-size:11px;color:var(--g600);min-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .note-wave{flex:1;display:flex;align-items:center;gap:2px;height:28px}
 .note-wave span{display:inline-block;width:3px;border-radius:2px;background:var(--blue-mid);opacity:.7}
-.note-item.active .note-wave span{background:var(--blue);opacity:1}
 .nplay{width:28px;height:28px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .note-item.active .nplay{background:var(--blue)}
 .nplay svg{width:14px;height:14px;fill:var(--g600)}
 .note-item.active .nplay svg{fill:white}
+.note-scrub-row{padding-left:48px}
+.note-scrub-area{position:relative;height:22px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.note-scrub-track{position:absolute;left:0;right:0;height:4px;background:var(--g300);border-radius:2px}
+.note-scrub-bar{height:4px;background:var(--blue);border-radius:2px;width:0%;pointer-events:none}
+.note-scrub-thumb{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);width:12px;height:12px;background:var(--blue);border-radius:50%;border:2px solid white;box-shadow:0 0 0 1px var(--blue);pointer-events:none}
+.note-scrub-time{display:flex;justify-content:space-between;font-size:10px;color:var(--g600);margin-top:2px;font-variant-numeric:tabular-nums}
 
 /* Collabs */
 .collab-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-md);border:1px solid var(--g200);margin-bottom:8px;background:white}
@@ -257,8 +267,9 @@ select:focus{border-color:var(--blue)}
           <div class="time-row"><span id="p-cur">0:00</span><span id="p-dur">0:00</span></div>
           <div class="controls">
             <button class="speed-btn" id="p-speed-btn" onclick="cycleSpeed('p')">1×</button>
+            <button class="skip-btn" onclick="skip(-10)" title="Back 10s"><svg viewBox="0 0 24 24"><path d="M11 19V5l-8 7 8 7z"/><path d="M21 19V5l-8 7 8 7z"/></svg><span>10</span></button>
             <button class="play-btn" onclick="togglePlay('p')"><svg id="p-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></button>
-            <div style="width:52px"></div>
+            <button class="skip-btn" onclick="skip(10)" title="Forward 10s"><svg viewBox="0 0 24 24"><path d="M13 5v14l8-7-8-7z"/><path d="M3 5v14l8-7-8-7z"/></svg><span>10</span></button>
           </div>
         </div>
         <div class="card">
@@ -327,7 +338,9 @@ select:focus{border-color:var(--blue)}
         <div class="time-row"><span id="r-cur">0:00</span><span id="r-dur">0:00</span></div>
         <div class="controls">
           <button class="speed-btn" id="r-speed-btn" onclick="cycleSpeed('r')">1×</button>
+          <button class="skip-btn" onclick="skip(-10)" title="Back 10s"><svg viewBox="0 0 24 24"><path d="M11 19V5l-8 7 8 7z"/><path d="M21 19V5l-8 7 8 7z"/></svg><span>10</span></button>
           <button class="play-btn" onclick="togglePlay('r')"><svg id="r-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></button>
+          <button class="skip-btn" onclick="skip(10)" title="Forward 10s"><svg viewBox="0 0 24 24"><path d="M13 5v14l8-7-8-7z"/><path d="M3 5v14l8-7-8-7z"/></svg><span>10</span></button>
           <button class="mic-btn" id="mic-btn" onclick="toggleRecord()">
             <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
           </button>
@@ -764,6 +777,12 @@ function togglePlay(prefix) {
   else { audio.pause(); setPlayIcon(prefix, 'play'); }
 }
 
+function skip(sec) {
+  if (!audio.src) return;
+  const dur = audio.duration || Infinity;
+  audio.currentTime = Math.max(0, Math.min(dur, audio.currentTime + sec));
+}
+
 function cycleSpeed(prefix) {
   if (prefix === 'p') { pSpeed = (pSpeed + 1) % speeds.length; audio.playbackRate = speeds[pSpeed]; document.getElementById('p-speed-btn').textContent = speeds[pSpeed] + '×'; }
   else { rSpeed = (rSpeed + 1) % speeds.length; audio.playbackRate = speeds[rSpeed]; document.getElementById('r-speed-btn').textContent = speeds[rSpeed] + '×'; }
@@ -821,13 +840,60 @@ function renderNotes(prefix) {
     item.className = 'note-item' + (active ? ' active' : '');
     item.id = 'ni-' + i;
     item.innerHTML = `
-      <span class="note-ts">${fmt(n.timestamp_sec)}</span>
-      ${who ? `<span class="note-who">${who}</span>` : ''}
-      <div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>
-      <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>`;
-    item.onclick = () => playNote(i, prefix);
+      <div class="note-top">
+        <span class="note-ts">${fmt(n.timestamp_sec)}</span>
+        ${who ? `<span class="note-who">${who}</span>` : ''}
+        ${active ? '' : `<div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>`}
+        <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>
+      </div>
+      ${active ? `
+      <div class="note-scrub-row">
+        <div class="note-scrub-area" id="scrub-area-${i}">
+          <div class="note-scrub-track"><div class="note-scrub-bar" id="scrub-bar-${i}"></div></div>
+          <div class="note-scrub-thumb" id="scrub-thumb-${i}"></div>
+        </div>
+        <div class="note-scrub-time"><span id="scrub-cur-${i}">0:00</span><span id="scrub-dur-${i}">0:00</span></div>
+      </div>` : ''}`;
+    item.querySelector('.note-top').onclick = () => playNote(i, prefix);
     el.appendChild(item);
+    if (active) setupNoteScrub(i);
   });
+}
+
+function updateNoteScrub(i) {
+  if (!noteAudio || !noteAudio.duration) return;
+  const pct = noteAudio.currentTime / noteAudio.duration * 100;
+  const bar = document.getElementById('scrub-bar-' + i);
+  const thumb = document.getElementById('scrub-thumb-' + i);
+  const cur = document.getElementById('scrub-cur-' + i);
+  if (bar) bar.style.width = pct + '%';
+  if (thumb) thumb.style.left = pct + '%';
+  if (cur) cur.textContent = fmt(noteAudio.currentTime);
+}
+
+function setupNoteScrub(i) {
+  const area = document.getElementById('scrub-area-' + i);
+  if (!area) return;
+  const seekFromEvent = e => {
+    if (!noteAudio || !noteAudio.duration) return;
+    const rect = area.getBoundingClientRect();
+    const x = e.clientX;
+    const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    noteAudio.currentTime = pct * noteAudio.duration;
+    updateNoteScrub(i);
+  };
+  area.onpointerdown = e => {
+    e.stopPropagation();
+    area.setPointerCapture(e.pointerId);
+    seekFromEvent(e);
+    const move = ev => seekFromEvent(ev);
+    const up = () => {
+      area.removeEventListener('pointermove', move);
+      area.removeEventListener('pointerup', up);
+    };
+    area.addEventListener('pointermove', move);
+    area.addEventListener('pointerup', up);
+  };
 }
 
 function playNote(i, prefix) {
@@ -838,6 +904,11 @@ function playNote(i, prefix) {
   renderNotes(prefix);
   const { data: urlData } = sb.storage.from('notes').getPublicUrl(notes[i].file_path);
   noteAudio = new Audio(urlData.publicUrl);
+  noteAudio.onloadedmetadata = () => {
+    const durEl = document.getElementById('scrub-dur-' + i);
+    if (durEl) durEl.textContent = fmt(noteAudio.duration);
+  };
+  noteAudio.ontimeupdate = () => updateNoteScrub(i);
   noteAudio.onended = () => { activeNote = -1; noteAudio = null; renderNotes(prefix); };
   noteAudio.play();
 }
