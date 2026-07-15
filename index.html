@@ -110,6 +110,11 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .note-item{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--g200);margin-bottom:8px;background:white;transition:background .1s,border-color .1s}
 .note-item:hover{background:var(--g100)}
 .note-item.active{border-color:var(--blue);background:var(--blue-light)}
+.note-item.note-done{opacity:.45}
+.note-item.note-done .note-ts{text-decoration:line-through}
+.note-dismiss{width:24px;height:24px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g400);flex-shrink:0;padding:0}
+.note-dismiss:hover{background:var(--g200);color:var(--g600)}
+.note-dismiss svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .note-top{display:flex;align-items:center;gap:10px;cursor:pointer}
 .note-ts{font-size:12px;font-weight:600;color:var(--blue);min-width:38px;font-variant-numeric:tabular-nums}
 .note-who{font-size:11px;color:var(--g600);min-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -428,11 +433,12 @@ let currentFolderEps = [];
 let currentEp = null;
 let notes = [];
 let activeNote = -1;
+let doneNotes = new Set();
 let noteAudio = null;
 let recorder = null;
 let isRec = false;
 let recChunks = [];
-let speeds = [1, 1.5, 2, 2.5];
+let speeds = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
 let pSpeed = 0, rSpeed = 0;
 const audio = document.getElementById('main-audio');
 const WH = [6,10,18,14,22,16,9,20,13,11,17,8,15,20,11,14,7,19,12,16];
@@ -809,8 +815,25 @@ async function loadNotes(prefix) {
     .order('timestamp_sec');
   if (error) { toast('Error loading notes: ' + error.message); return; }
   notes = data || [];
+  loadDoneNotes();
   renderNotes(prefix);
   renderDots(prefix);
+}
+
+function loadDoneNotes() {
+  const all = JSON.parse(localStorage.getItem('wysdom-done-notes') || '{}');
+  doneNotes = new Set(all[String(currentEp.id)] || []);
+}
+
+function toggleNoteDone(noteId, prefix) {
+  const all = JSON.parse(localStorage.getItem('wysdom-done-notes') || '{}');
+  const epKey = String(currentEp.id);
+  const list = new Set(all[epKey] || []);
+  if (list.has(noteId)) list.delete(noteId); else list.add(noteId);
+  all[epKey] = [...list];
+  localStorage.setItem('wysdom-done-notes', JSON.stringify(all));
+  doneNotes = list;
+  renderNotes(prefix);
 }
 
 function renderDots(prefix) {
@@ -835,9 +858,10 @@ function renderNotes(prefix) {
   el.innerHTML = '';
   notes.forEach((n, i) => {
     const active = activeNote === i;
+    const done = doneNotes.has(n.id);
     const who = n.collaborators?.name || '';
     const item = document.createElement('div');
-    item.className = 'note-item' + (active ? ' active' : '');
+    item.className = 'note-item' + (active ? ' active' : '') + (done ? ' note-done' : '');
     item.id = 'ni-' + i;
     item.innerHTML = `
       <div class="note-top">
@@ -845,6 +869,9 @@ function renderNotes(prefix) {
         ${who ? `<span class="note-who">${who}</span>` : ''}
         ${active ? '' : `<div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>`}
         <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>
+        <button class="note-dismiss" title="${done ? 'Mark as not done' : 'Mark as done'}">${done
+          ? '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.7 3"/><path d="M3 3v6h6"/></svg>'
+          : '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}</button>
       </div>
       ${active ? `
       <div class="note-scrub-row">
@@ -855,6 +882,7 @@ function renderNotes(prefix) {
         <div class="note-scrub-time"><span id="scrub-cur-${i}">0:00</span><span id="scrub-dur-${i}">0:00</span></div>
       </div>` : ''}`;
     item.querySelector('.note-top').onclick = () => playNote(i, prefix);
+    item.querySelector('.note-dismiss').onclick = (e) => { e.stopPropagation(); toggleNoteDone(n.id, prefix); };
     el.appendChild(item);
     if (active) setupNoteScrub(i);
   });
