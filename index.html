@@ -115,6 +115,10 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .note-dismiss{width:24px;height:24px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g400);flex-shrink:0;padding:0}
 .note-dismiss:hover{background:var(--g200);color:var(--g600)}
 .note-dismiss svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.note-download{width:24px;height:24px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g400);flex-shrink:0;padding:0}
+.note-download:hover{background:var(--g200);color:var(--g600)}
+.note-download svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.note-download.loading{opacity:.5;pointer-events:none}
 .note-top{display:flex;align-items:center;gap:10px;cursor:pointer}
 .note-ts{font-size:12px;font-weight:600;color:var(--blue);min-width:38px;font-variant-numeric:tabular-nums}
 .note-who{font-size:11px;color:var(--g600);min-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -836,6 +840,29 @@ function toggleNoteDone(noteId, prefix) {
   renderNotes(prefix);
 }
 
+async function downloadNote(n, btn) {
+  if (btn) btn.classList.add('loading');
+  try {
+    const { data: urlData } = sb.storage.from('notes').getPublicUrl(n.file_path);
+    const resp = await fetch(urlData.publicUrl);
+    if (!resp.ok) throw new Error('Could not fetch audio (' + resp.status + ')');
+    const blob = await resp.blob();
+    const ext = n.file_path.includes('.') ? n.file_path.split('.').pop() : 'webm';
+    const who = n.collaborators?.name ? n.collaborators.name.replace(/[^a-zA-Z0-9]+/g, '_') + '_' : '';
+    const filename = `${who}note_${Math.floor(n.timestamp_sec)}s.${ext}`;
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(blobUrl);
+  } catch (e) {
+    toast('Download failed: ' + e.message);
+  }
+  if (btn) btn.classList.remove('loading');
+}
+
 function renderDots(prefix) {
   const track = document.getElementById(prefix + '-prog-track');
   if (!track || !audio.duration) return;
@@ -869,6 +896,7 @@ function renderNotes(prefix) {
         ${who ? `<span class="note-who">${who}</span>` : ''}
         ${active ? '' : `<div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>`}
         <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>
+        <button class="note-download" title="Download this clip"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/></svg></button>
         <button class="note-dismiss" title="${done ? 'Mark as not done' : 'Mark as done'}">${done
           ? '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.7 3"/><path d="M3 3v6h6"/></svg>'
           : '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}</button>
@@ -882,6 +910,7 @@ function renderNotes(prefix) {
         <div class="note-scrub-time"><span id="scrub-cur-${i}">0:00</span><span id="scrub-dur-${i}">0:00</span></div>
       </div>` : ''}`;
     item.querySelector('.note-top').onclick = () => playNote(i, prefix);
+    item.querySelector('.note-download').onclick = (e) => { e.stopPropagation(); downloadNote(n, e.currentTarget); };
     item.querySelector('.note-dismiss').onclick = (e) => { e.stopPropagation(); toggleNoteDone(n.id, prefix); };
     el.appendChild(item);
     if (active) setupNoteScrub(i);
