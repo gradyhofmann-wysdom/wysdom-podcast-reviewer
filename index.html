@@ -204,11 +204,11 @@ select:focus{border-color:var(--blue)}
   <div class="login-card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem">
       <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
-      <div><div style="font-size:15px;font-weight:600">Wysdom reviewer</div><div style="font-size:12px;color:var(--g600)">Producer login</div></div>
+      <div><div style="font-size:15px;font-weight:600">Wysdom reviewer</div><div style="font-size:12px;color:var(--g600)">Producer or guest login</div></div>
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="login-pw" placeholder="Enter producer password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="login-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn btn-primary btn-full" onclick="doLogin()">Sign in</button>
     <div class="err" id="login-err">Incorrect password.</div>
@@ -313,6 +313,7 @@ select:focus{border-color:var(--blue)}
     <div class="header">
       <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
       <div class="header-text"><h1>Wysdom reviewer</h1><p id="r-greeting">Welcome</p></div>
+      <button class="btn btn-sm" id="r-signout-btn" style="margin-left:auto;display:none" onclick="logout()">Sign out</button>
     </div>
 
     <!-- Folders -->
@@ -426,6 +427,7 @@ select:focus{border-color:var(--blue)}
 const SUPABASE_URL = 'https://osghkfbigroxxxinkdgb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zZ2hrZmJpZ3JveHh4aW5rZGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMzU1MzMsImV4cCI6MjA5NzgxMTUzM30.n8LALQm8p6AuQjvjPk0p0su_FZ-Hyafc6Qw8rWHla9M';
 const PRODUCER_PW = 'wysdom2026'; // change before hosting
+const GUEST_PW = 'wysdomguest2026'; // guest reviewer login — change before hosting
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -464,7 +466,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       toast('Invalid reviewer link.');
     }
   } else {
-    if (sessionStorage.getItem('wysdom-auth') === PRODUCER_PW) enterProducer();
+    const savedRole = sessionStorage.getItem('wysdom-auth');
+    if (savedRole === 'producer') enterProducer();
+    else if (savedRole === 'guest') enterGuest();
   }
 });
 
@@ -472,9 +476,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 function doLogin() {
   const pw = document.getElementById('login-pw').value;
   if (pw === PRODUCER_PW) {
-    sessionStorage.setItem('wysdom-auth', pw);
+    sessionStorage.setItem('wysdom-auth', 'producer');
     document.getElementById('login-err').style.display = 'none';
     enterProducer();
+  } else if (pw === GUEST_PW) {
+    sessionStorage.setItem('wysdom-auth', 'guest');
+    document.getElementById('login-err').style.display = 'none';
+    enterGuest();
   } else {
     document.getElementById('login-err').style.display = 'block';
   }
@@ -486,6 +494,27 @@ function enterProducer() {
   show('producer-view');
   pLoadFolders();
   loadCollabs();
+}
+
+async function enterGuest() {
+  role = 'guest';
+  hide('login-view');
+  show('reviewer-view');
+  document.getElementById('r-signout-btn').style.display = 'inline-flex';
+  document.getElementById('r-greeting').textContent = 'Hi, Guest';
+
+  let { data: existing, error: findErr } = await sb.from('collaborators').select('*').eq('is_guest_account', true).maybeSingle();
+  if (findErr) { toast('Error loading guest account: ' + findErr.message); return; }
+  if (!existing) {
+    const token = 'guest-' + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
+    const { data: created, error: createErr } = await sb.from('collaborators')
+      .insert({ name: 'Guest', token, is_guest_account: true })
+      .select().single();
+    if (createErr) { toast('Error creating guest account: ' + createErr.message); return; }
+    existing = created;
+  }
+  collaborator = existing;
+  rLoadFolders();
 }
 
 function logout() {
@@ -814,11 +843,13 @@ function setProgress(prefix, cur, dur) {
 // ── NOTES ───────────────────────────────────────
 async function loadNotes(prefix) {
   const { data, error } = await sb.from('voice_notes')
-    .select('*, collaborators(name)')
+    .select('*, collaborators(name, hidden_from_guest)')
     .eq('episode_id', currentEp.id)
     .order('timestamp_sec');
   if (error) { toast('Error loading notes: ' + error.message); return; }
-  notes = data || [];
+  let all = data || [];
+  if (role === 'guest') all = all.filter(n => !n.collaborators?.hidden_from_guest);
+  notes = all;
   loadDoneNotes();
   renderNotes(prefix);
   renderDots(prefix);
@@ -1075,19 +1106,31 @@ async function loadCollabs() {
   const { data, error } = await sb.from('collaborators').select('*').order('created_at');
   const el = document.getElementById('co-list');
   if (error) { el.innerHTML = '<div class="empty">Error loading collaborators: ' + error.message + '</div>'; return; }
-  if (!data || !data.length) { el.innerHTML = '<div class="empty">No collaborators yet.</div>'; return; }
+  const real = (data || []).filter(c => !c.is_guest_account);
+  if (!real.length) { el.innerHTML = '<div class="empty">No collaborators yet.</div>'; return; }
   el.innerHTML = '';
-  data.forEach(c => {
+  real.forEach(c => {
     const link = location.origin + location.pathname + '?reviewer=' + c.token;
     const initials = c.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const d = document.createElement('div');
     d.className = 'collab-row';
+    d.style.flexWrap = 'wrap';
     d.innerHTML = `
       <div class="collab-av">${initials}</div>
       <div class="collab-info"><div class="collab-name">${c.name}</div><div class="collab-link">${link}</div></div>
-      <button class="copy-btn" onclick="copyLink('${link}')">Copy</button>`;
+      <button class="copy-btn" onclick="copyLink('${link}')">Copy</button>
+      <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--g600);width:100%;margin-top:6px;cursor:pointer">
+        <input type="checkbox" ${c.hidden_from_guest ? 'checked' : ''} onchange="toggleHiddenFromGuest('${c.id}', this.checked)">
+        Hide from guest
+      </label>`;
     el.appendChild(d);
   });
+}
+
+async function toggleHiddenFromGuest(id, hidden) {
+  const { error } = await sb.from('collaborators').update({ hidden_from_guest: hidden }).eq('id', id);
+  if (error) { toast('Error updating: ' + error.message); loadCollabs(); return; }
+  toast(hidden ? 'Hidden from guest' : 'Visible to guest');
 }
 
 async function addCollab() {
