@@ -146,6 +146,43 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 
 .divider{height:1px;background:var(--g200);margin:1rem 0}
 .empty{text-align:center;padding:1.5rem 1rem;color:var(--g400);font-size:14px}
+
+/* How-to guide */
+.guide-card{background:var(--blue-light);border:1px solid rgba(24,95,165,.18);border-radius:var(--r-xl);padding:1.1rem 1.25rem;margin-bottom:1rem}
+.guide-head{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:0;font-family:inherit;cursor:pointer;color:var(--blue);text-align:left}
+.guide-head svg.gi{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.guide-head h3{font-size:13px;font-weight:700;letter-spacing:.02em;flex:1}
+.guide-chev{width:15px;height:15px;stroke:var(--blue);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;flex-shrink:0}
+.guide-card.collapsed .guide-chev{transform:rotate(-90deg)}
+.guide-card.collapsed .guide-body{display:none}
+.guide-body{margin-top:.9rem}
+.guide-steps{list-style:none;counter-reset:gs}
+.guide-steps li{counter-increment:gs;position:relative;padding-left:30px;margin-bottom:.7rem;font-size:13px;line-height:1.5;color:var(--g900)}
+.guide-steps li:last-child{margin-bottom:0}
+.guide-steps li::before{content:counter(gs);position:absolute;left:0;top:0;width:21px;height:21px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.guide-steps b{font-weight:600}
+.guide-foot{font-size:12px;color:var(--g600);margin-top:.85rem;padding-top:.75rem;border-top:1px solid rgba(24,95,165,.15);line-height:1.5}
+
+/* Commentary */
+.comm-card{border:1px solid var(--coral-border);background:var(--coral-light)}
+.comm-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--coral-dark);margin-bottom:6px}
+.comm-title svg{width:17px;height:17px;stroke:var(--coral-dark);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.comm-copy{font-size:13px;line-height:1.55;color:var(--coral-dark);margin-bottom:1rem}
+.btn-coral{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn-coral:hover{background:#c04e28}
+.btn-coral.recording{animation:pulse-mic 1s infinite}
+.btn-coral svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.comm-note{font-size:11px;color:var(--coral-dark);opacity:.85;margin-top:8px;text-align:center}
+.badge-comm{background:var(--coral);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;letter-spacing:.02em}
+.rec-timer{margin-left:auto;font-size:13px;font-weight:600;color:var(--coral-dark);font-variant-numeric:tabular-nums}
+
+/* Access code */
+.code-badge{display:inline-flex;align-items:center;gap:4px;background:#EAF3DE;color:#3B6D11;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.code-badge svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.code-show{background:var(--g100);border:1px solid var(--g200);border-radius:var(--r-md);padding:10px 12px;margin-top:.5rem}
+.code-show .cs-label{font-size:11px;color:var(--g600);margin-bottom:3px}
+.code-show .cs-val{font-size:12px;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--g900);line-height:1.45}
+.hint{font-size:11px;color:var(--g400);margin-top:5px;line-height:1.45}
 .export-note{font-size:12px;color:var(--g600);margin-top:8px;line-height:1.5}
 
 /* Episode action menu */
@@ -192,6 +229,13 @@ select:focus{border-color:var(--blue)}
   .status-in-progress{background:#2a1e08;color:#FAC775}
   .status-done{background:#173404;color:#C0DD97}
   .status-archived{background:#2e2e2b;color:#888780}
+  .guide-card{background:#0c1e30;border-color:#1d4670}
+  .guide-head,.guide-head h3{color:#85B7EB}
+  .guide-head svg.gi,.guide-chev{stroke:#85B7EB}
+  .guide-steps li::before{background:#2a6bb0}
+  .guide-foot{border-top-color:#1d4670}
+  .code-badge{background:#173404;color:#C0DD97}
+  .code-show{background:#111110;border-color:#2e2e2b}
 }
 </style>
 </head>
@@ -201,17 +245,33 @@ select:focus{border-color:var(--blue)}
 
 <!-- ── LOGIN ── -->
 <div id="login-view">
-  <div class="login-card">
+  <div class="login-card" id="pw-card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem">
       <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
-      <div><div style="font-size:15px;font-weight:600">Wysdom reviewer</div><div style="font-size:12px;color:var(--g600)">Producer or guest login</div></div>
+      <div><div style="font-size:15px;font-weight:600">Wysdom reviewer</div><div style="font-size:12px;color:var(--g600)">Enter your password or episode code</div></div>
     </div>
     <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="login-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+      <label>Password / episode code</label>
+      <input type="password" id="login-pw" placeholder="Enter password or code" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn btn-primary btn-full" onclick="doLogin()">Sign in</button>
-    <div class="err" id="login-err">Incorrect password.</div>
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="err" id="login-err">Incorrect password or code.</div>
+  </div>
+
+  <!-- Name step for episode-code reviewers -->
+  <div class="login-card" id="name-card" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
+      <div><div style="font-size:15px;font-weight:600">You're in</div><div style="font-size:12px;color:var(--g600)">One quick thing first</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--g600);margin-bottom:1.25rem">You've been invited to review<br><b id="name-card-ep" style="color:var(--g900)"></b></p>
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="code-name" placeholder="e.g. Dr. Patel" onkeydown="if(event.key==='Enter')startCodeSession()">
+      <p class="hint">So your notes are credited to you.</p>
+    </div>
+    <button class="btn btn-primary btn-full" id="code-name-btn" onclick="startCodeSession()">Start reviewing</button>
+    <div class="err" id="code-name-err"></div>
   </div>
 </div>
 
@@ -241,6 +301,14 @@ select:focus{border-color:var(--blue)}
           <div class="card-title">Upload new episode</div>
           <div class="form-group"><label>Title</label><input type="text" id="up-title" placeholder="e.g. TAE for Plantar Heel Pain — Draft 1"></div>
           <div class="form-group"><label>Folder</label><input type="text" id="up-folder" placeholder="e.g. Wysdom Radio Season 1"></div>
+          <div class="form-group">
+            <label>Private access code <span style="font-weight:400;color:var(--g400)">— optional</span></label>
+            <div style="display:flex;gap:6px">
+              <input type="text" id="up-code" placeholder="e.g. patel-heel-pain" autocapitalize="off" autocorrect="off" spellcheck="false" onblur="this.value=normCode(this.value)">
+              <button class="btn btn-sm" style="flex-shrink:0" onclick="fillRandomUploadCode()">Generate</button>
+            </div>
+            <p class="hint">Give this code to one reviewer and they'll see <b>only this episode</b> — nothing else in the library.</p>
+          </div>
           <div class="upload-zone" id="upload-zone" onclick="document.getElementById('up-file').click()">
             <svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
             <h3>Choose file</h3>
@@ -335,7 +403,27 @@ select:focus{border-color:var(--blue)}
 
     <!-- Player (reviewer) -->
     <div id="r-player" style="display:none">
-      <button class="back-btn" onclick="rBackToList()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+      <button class="back-btn" id="r-back-btn" onclick="rBackToList()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+
+      <!-- How to use -->
+      <div class="guide-card" id="guide-card">
+        <button class="guide-head" onclick="toggleGuide()">
+          <svg class="gi" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          <h3>HOW THIS WORKS — 30 SECOND READ</h3>
+          <svg class="guide-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="guide-body">
+          <ol class="guide-steps">
+            <li><b>Press play</b> and listen. Use the <b>10</b> buttons to jump back or forward ten seconds, and the <b>1×</b> button to speed things up.</li>
+            <li><b>Hear something worth flagging?</b> Tap the orange <b>mic</b>. The episode pauses automatically so you can talk.</li>
+            <li><b>Tap the mic again</b> to save. Your note is pinned to that exact second — no need to write down timestamps.</li>
+            <li><b>Keep going.</b> Everything saves as you go, so you can close the page and pick it back up later.</li>
+            <li>When you're done, <b>scroll to the bottom</b> if you'd like to record a closing commentary for the episode.</li>
+          </ol>
+          <p class="guide-foot">Safe to listen while driving — just tap the mic, talk, and tap again. You can review or delete anything in "Your notes" below.</p>
+        </div>
+      </div>
+
       <div class="card">
         <div class="player-title" id="r-ep-title"></div>
         <div class="player-sub">Tap the mic to leave a voice note — audio pauses while you speak</div>
@@ -355,12 +443,28 @@ select:focus{border-color:var(--blue)}
             <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
           </button>
         </div>
-        <div class="rec-banner" id="rec-banner"><div class="rec-dot"></div><span>Recording… tap mic again to save</span></div>
+        <div class="rec-banner" id="rec-banner"><div class="rec-dot"></div><span id="rec-banner-text">Recording… tap mic again to save</span><span class="rec-timer" id="rec-timer">0:00</span></div>
         <p class="mic-hint">Tap the mic to drop a voice note at this moment</p>
       </div>
       <div class="card">
         <div class="card-title">Your notes</div>
         <div id="r-notes-list"><div class="empty">No notes yet — hit the mic while listening</div></div>
+      </div>
+
+      <!-- Closing commentary -->
+      <div class="card comm-card">
+        <div class="comm-title">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Add a closing commentary
+        </div>
+        <p class="comm-copy">
+          We're looking for a <b>1–5 minute commentary</b> to run at the very end of the episode. If there's anything you'd like to add — your take, extra context, a clinical caveat, where you think the field is heading — record it here. <b>You'll be credited in full</b> on the episode.
+        </p>
+        <button class="btn btn-coral btn-full" id="comm-btn" onclick="toggleRecord(true)">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+          <span id="comm-btn-label">Record commentary</span>
+        </button>
+        <p class="comm-note" id="comm-note">Optional — take as long or short as you like within about five minutes.</p>
       </div>
     </div>
   </div>
@@ -409,6 +513,40 @@ select:focus{border-color:var(--blue)}
   </div>
 </div>
 
+<!-- Access code modal -->
+<div class="modal-overlay" id="code-modal" style="display:none" onclick="if(event.target===this)closeCodeModal()">
+  <div class="modal">
+    <h3>Private access code</h3>
+    <p id="code-modal-ep-name" style="font-weight:500;color:var(--g900);margin-bottom:.75rem"></p>
+    <p style="font-size:13px;color:var(--g600);margin-bottom:1rem">Anyone with this code sees only this one episode. Leave blank for no code.</p>
+    <div class="form-group">
+      <label>Access code</label>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="code-input" placeholder="e.g. patel-heel-pain" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="renderCodeLink()">
+        <button class="btn btn-sm" style="flex-shrink:0" onclick="genCodeIntoModal()">Generate</button>
+      </div>
+    </div>
+    <div id="code-link-wrap" style="display:none">
+      <div class="code-show">
+        <div class="cs-label">Code to give them</div>
+        <div class="cs-val" id="code-show-code"></div>
+      </div>
+      <div class="code-show">
+        <div class="cs-label">Or send this one-tap link</div>
+        <div class="cs-val" id="code-show-link"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:.6rem">
+        <button class="btn btn-sm" onclick="copyLink(document.getElementById('code-show-code').textContent)">Copy code</button>
+        <button class="btn btn-sm" onclick="copyLink(document.getElementById('code-show-link').textContent)">Copy link</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeCodeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCode()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm delete dialog -->
 <div class="modal-overlay" id="delete-modal" style="display:none" onclick="if(event.target===this)closeDeleteModal()">
   <div class="modal">
@@ -444,6 +582,10 @@ let noteAudio = null;
 let recorder = null;
 let isRec = false;
 let recChunks = [];
+let singleEp = null;        // set when signed in with a per-episode access code
+let pendingCode = null;     // episode matched by code, awaiting name entry
+let pendingCommentary = false;
+let recTimerInt = null;
 let speeds = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
 let pSpeed = 0, rSpeed = 0;
 const audio = document.getElementById('main-audio');
@@ -451,7 +593,29 @@ const WH = [6,10,18,14,22,16,9,20,13,11,17,8,15,20,11,14,7,19,12,16];
 
 // ── BOOT ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  const token = new URLSearchParams(location.search).get('reviewer');
+  const params = new URLSearchParams(location.search);
+
+  // One-tap episode-code link: ?code=xxxx
+  const urlCode = params.get('code');
+  if (urlCode) {
+    const ep = await findEpisodeByCode(urlCode);
+    if (ep) { promptForName(ep); return; }
+    toast('That episode code is no longer valid.');
+  }
+
+  // Returning code-reviewer in the same tab
+  const savedCode = sessionStorage.getItem('wysdom-ep-code');
+  if (savedCode && !urlCode) {
+    const ep = await findEpisodeByCode(savedCode);
+    if (ep) {
+      const savedCollab = await getStoredCodeCollab(ep.id);
+      if (savedCollab) { enterEpisodeMode(ep, savedCollab); return; }
+      promptForName(ep); return;
+    }
+    sessionStorage.removeItem('wysdom-ep-code');
+  }
+
+  const token = params.get('reviewer');
   if (token) {
     const { data, error } = await sb.from('collaborators').select('*').eq('token', token).maybeSingle();
     if (error) { toast('Error loading reviewer: ' + error.message); return; }
@@ -473,19 +637,118 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ── AUTH ────────────────────────────────────────
-function doLogin() {
+// Codes are lowercased and stripped to letters/numbers/dashes so they survive
+// mobile autocapitalise and are safe to put in a URL.
+function normCode(s) {
+  return (s || '').trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+}
+
+async function findEpisodeByCode(raw) {
+  const code = normCode(raw);
+  if (!code) return null;
+  const { data, error } = await sb.from('episodes').select('*').eq('access_code', code).limit(1);
+  if (error) { toast('Error checking code: ' + error.message); return null; }
+  return (data && data.length) ? data[0] : null;
+}
+
+async function doLogin() {
   const pw = document.getElementById('login-pw').value;
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
+  err.style.display = 'none';
+
   if (pw === PRODUCER_PW) {
     sessionStorage.setItem('wysdom-auth', 'producer');
-    document.getElementById('login-err').style.display = 'none';
     enterProducer();
-  } else if (pw === GUEST_PW) {
-    sessionStorage.setItem('wysdom-auth', 'guest');
-    document.getElementById('login-err').style.display = 'none';
-    enterGuest();
-  } else {
-    document.getElementById('login-err').style.display = 'block';
+    return;
   }
+  if (pw === GUEST_PW) {
+    sessionStorage.setItem('wysdom-auth', 'guest');
+    enterGuest();
+    return;
+  }
+
+  // Not a global password — try it as a per-episode access code
+  btn.disabled = true; btn.textContent = 'Checking…';
+  const ep = await findEpisodeByCode(pw);
+  btn.disabled = false; btn.textContent = 'Sign in';
+
+  if (ep) { promptForName(ep); return; }
+  err.textContent = 'Incorrect password or code.';
+  err.style.display = 'block';
+}
+
+function promptForName(ep) {
+  pendingCode = ep;
+  hide('pw-card');
+  show('name-card');
+  show('login-view');
+  document.getElementById('login-view').style.display = 'flex';
+  document.getElementById('name-card-ep').textContent = ep.title;
+  const saved = localStorage.getItem('wysdom-code-name');
+  if (saved) document.getElementById('code-name').value = saved;
+  setTimeout(() => document.getElementById('code-name').focus(), 100);
+}
+
+// Reuse this browser's identity for an episode so notes stay grouped
+async function getStoredCodeCollab(epId) {
+  const id = localStorage.getItem('wysdom-code-collab-' + epId);
+  if (!id) return null;
+  const { data } = await sb.from('collaborators').select('*').eq('id', id).maybeSingle();
+  return data || null;
+}
+
+async function startCodeSession() {
+  const nameEl = document.getElementById('code-name');
+  const errEl = document.getElementById('code-name-err');
+  const btn = document.getElementById('code-name-btn');
+  const name = nameEl.value.trim();
+  errEl.style.display = 'none';
+
+  if (!name) { errEl.textContent = 'Please enter your name.'; errEl.style.display = 'block'; return; }
+  if (!pendingCode) { errEl.textContent = 'Session expired — please reload.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Loading…';
+
+  let collab = await getStoredCodeCollab(pendingCode.id);
+  if (collab && collab.name !== name) {
+    await sb.from('collaborators').update({ name }).eq('id', collab.id);
+    collab.name = name;
+  }
+
+  if (!collab) {
+    const token = 'ep-' + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
+    const { data: created, error } = await sb.from('collaborators')
+      .insert({ name, token, is_guest_account: true, hidden_from_guest: true })
+      .select().single();
+    btn.disabled = false; btn.textContent = 'Start reviewing';
+    if (error) { errEl.textContent = 'Error: ' + error.message; errEl.style.display = 'block'; return; }
+    collab = created;
+    localStorage.setItem('wysdom-code-collab-' + pendingCode.id, collab.id);
+  }
+
+  btn.disabled = false; btn.textContent = 'Start reviewing';
+  localStorage.setItem('wysdom-code-name', name);
+  sessionStorage.setItem('wysdom-ep-code', pendingCode.access_code);
+  enterEpisodeMode(pendingCode, collab);
+}
+
+function enterEpisodeMode(ep, collab) {
+  role = 'episode';
+  singleEp = ep;
+  collaborator = collab;
+  pendingCode = null;
+
+  hide('login-view');
+  hide('name-card');
+  show('pw-card');
+  show('reviewer-view');
+  hide('r-folders');
+  hide('r-eplist');
+  document.getElementById('r-signout-btn').style.display = 'inline-flex';
+  document.getElementById('r-back-btn').style.display = 'none';
+  document.getElementById('r-greeting').textContent = 'Hi, ' + collab.name;
+  openEpisode('r', ep);
 }
 
 function enterProducer() {
@@ -519,7 +782,14 @@ async function enterGuest() {
 
 function logout() {
   sessionStorage.removeItem('wysdom-auth');
-  location.reload();
+  sessionStorage.removeItem('wysdom-ep-code');
+  location.replace(location.origin + location.pathname);
+}
+
+function toggleGuide() {
+  const c = document.getElementById('guide-card');
+  c.classList.toggle('collapsed');
+  localStorage.setItem('wysdom-guide-collapsed', c.classList.contains('collapsed') ? '1' : '0');
 }
 
 // ── TABS ────────────────────────────────────────
@@ -595,6 +865,7 @@ async function pRenderEpList(items) {
         <div class="ep-title">${ep.title}</div>
         <div class="ep-sub">${ep.folder}</div>
       </div>
+      ${ep.access_code ? `<span class="code-badge" title="Private code: ${ep.access_code}"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3"/></svg>Code</span>` : ''}
       ${st ? `<span class="status-badge ${st.cls}">${st.label}</span>` : ''}
       ${count > 0 ? `<span class="badge">${count} note${count!==1?'s':''}</span>` : ''}
       <button class="ep-menu-btn" aria-label="Episode options" data-epid="${ep.id}">
@@ -619,6 +890,7 @@ function openEpMenu(e, ep) {
   dropdown.innerHTML = `
     <button onclick="openMoveModal()"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Move to folder</button>
     <button onclick="openStatusModal()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Set status</button>
+    <button onclick="openCodeModal()"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3"/></svg>Access code</button>
     <div class="divider-line"></div>
     <button class="danger" onclick="openDeleteModal()"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>Delete episode</button>`;
   btn.parentElement.appendChild(dropdown);
@@ -682,6 +954,68 @@ async function confirmStatus() {
   closeStatusModal();
   toast('Status updated!');
   menuEp.status = status;
+  pRenderEpList(currentFolderEps);
+}
+
+// ── ACCESS CODE ─────────────────────────────────
+const CODE_WORDS = ['heel','spine','tendon','nerve','joint','pulse','cortex','marrow','fascia','plexus'];
+
+function randomCode() {
+  const w = CODE_WORDS[Math.floor(Math.random() * CODE_WORDS.length)];
+  return w + '-' + Math.random().toString(36).slice(2, 6);
+}
+
+function fillRandomUploadCode() {
+  document.getElementById('up-code').value = randomCode();
+}
+
+function genCodeIntoModal() {
+  document.getElementById('code-input').value = randomCode();
+  renderCodeLink();
+}
+
+function codeLinkFor(code) {
+  return location.origin + location.pathname + '?code=' + encodeURIComponent(code);
+}
+
+function renderCodeLink() {
+  const code = normCode(document.getElementById('code-input').value);
+  const wrap = document.getElementById('code-link-wrap');
+  if (!code) { wrap.style.display = 'none'; return; }
+  document.getElementById('code-show-code').textContent = code;
+  document.getElementById('code-show-link').textContent = codeLinkFor(code);
+  wrap.style.display = 'block';
+}
+
+function openCodeModal() {
+  closeActiveDropdown();
+  if (!menuEp) return;
+  document.getElementById('code-modal-ep-name').textContent = menuEp.title;
+  document.getElementById('code-input').value = menuEp.access_code || '';
+  renderCodeLink();
+  document.getElementById('code-modal').style.display = 'flex';
+}
+
+function closeCodeModal() { document.getElementById('code-modal').style.display = 'none'; }
+
+async function saveCode() {
+  if (!menuEp) return;
+  const code = normCode(document.getElementById('code-input').value) || null;
+
+  if (code) {
+    if (code === normCode(PRODUCER_PW) || code === normCode(GUEST_PW)) {
+      toast('That code clashes with a login password — pick another.'); return;
+    }
+    const clash = await findEpisodeByCode(code);
+    if (clash && clash.id !== menuEp.id) { toast('Already used by "' + clash.title + '".'); return; }
+  }
+
+  const { error } = await sb.from('episodes').update({ access_code: code }).eq('id', menuEp.id);
+  if (error) { toast('Error saving code: ' + error.message); return; }
+
+  menuEp.access_code = code;
+  closeCodeModal();
+  toast(code ? 'Access code saved.' : 'Access code removed.');
   pRenderEpList(currentFolderEps);
 }
 
@@ -773,7 +1107,15 @@ async function openEpisode(prefix, ep) {
   if (noteAudio) { noteAudio.pause(); noteAudio = null; }
 
   if (prefix === 'p') { hide('p-eplist'); show('p-player'); document.getElementById('p-ep-title').textContent = ep.title; document.getElementById('p-ep-sub').textContent = ep.folder; }
-  else { hide('r-eplist'); show('r-player'); document.getElementById('r-ep-title').textContent = ep.title; }
+  else {
+    hide('r-eplist'); show('r-player');
+    document.getElementById('r-ep-title').textContent = ep.title;
+    document.getElementById('r-back-btn').style.display = role === 'episode' ? 'none' : 'flex';
+    document.getElementById('guide-card').classList.toggle('collapsed',
+      localStorage.getItem('wysdom-guide-collapsed') === '1');
+    setCommentaryBtn(false);
+    window.scrollTo(0, 0);
+  }
 
   const { data: urlData } = sb.storage.from('episodes').getPublicUrl(ep.file_path);
   audio.src = urlData.publicUrl;
@@ -809,6 +1151,8 @@ function stopAudio() {
   if (recorder && recorder.state !== 'inactive') try { recorder.stop(); } catch(e) {}
   document.getElementById('rec-banner').classList.remove('on');
   document.getElementById('mic-btn').classList.remove('recording');
+  stopRecTimer();
+  setCommentaryBtn(false);
 }
 
 function togglePlay(prefix) {
@@ -849,6 +1193,8 @@ async function loadNotes(prefix) {
   if (error) { toast('Error loading notes: ' + error.message); return; }
   let all = data || [];
   if (role === 'guest') all = all.filter(n => !n.collaborators?.hidden_from_guest);
+  // Per-episode code reviewers only ever see their own notes
+  if (role === 'episode' && collaborator) all = all.filter(n => n.collaborator_id === collaborator.id);
   notes = all;
   loadDoneNotes();
   renderNotes(prefix);
@@ -923,7 +1269,8 @@ function renderNotes(prefix) {
     item.id = 'ni-' + i;
     item.innerHTML = `
       <div class="note-top">
-        <span class="note-ts">${fmt(n.timestamp_sec)}</span>
+        <span class="note-ts">${n.is_commentary ? 'End' : fmt(n.timestamp_sec)}</span>
+        ${n.is_commentary ? '<span class="badge-comm">Commentary</span>' : ''}
         ${who ? `<span class="note-who">${who}</span>` : ''}
         ${active ? '' : `<div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>`}
         <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>
@@ -1002,13 +1349,43 @@ function playNote(i, prefix) {
 }
 
 // ── RECORDING ───────────────────────────────────
-async function toggleRecord() {
+function setCommentaryBtn(recording) {
+  const label = document.getElementById('comm-btn-label');
+  const btn = document.getElementById('comm-btn');
+  const note = document.getElementById('comm-note');
+  if (!label) return;
+  label.textContent = recording ? 'Stop & save commentary' : 'Record commentary';
+  btn.classList.toggle('recording', recording);
+  note.textContent = recording
+    ? 'Recording your commentary — tap again when you\'re finished.'
+    : 'Optional — take as long or short as you like within about five minutes.';
+}
+
+function startRecTimer() {
+  const el = document.getElementById('rec-timer');
+  const t0 = Date.now();
+  el.textContent = '0:00';
+  clearInterval(recTimerInt);
+  recTimerInt = setInterval(() => { el.textContent = fmt((Date.now() - t0) / 1000); }, 500);
+}
+
+function stopRecTimer() { clearInterval(recTimerInt); recTimerInt = null; }
+
+async function toggleRecord(isCommentary) {
   if (isRec) { recorder.stop(); return; }
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
   catch { toast('Mic access denied. Please allow microphone access.'); return; }
 
-  const ts = audio.currentTime;
+  const commentary = !!isCommentary;
+  pendingCommentary = commentary;
+
+  // Commentary is pinned to the very end so it splices in after the episode
+  const ts = commentary
+    ? (isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (audio.currentTime || 0))
+    : audio.currentTime;
+
+  const wasPlaying = !audio.paused;
   audio.pause();
   setPlayIcon('r', 'play');
   recChunks = [];
@@ -1017,34 +1394,46 @@ async function toggleRecord() {
   recorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
   recorder.onstop = async () => {
     isRec = false;
+    stopRecTimer();
     document.getElementById('mic-btn').classList.remove('recording');
     document.getElementById('rec-banner').classList.remove('on');
+    setCommentaryBtn(false);
     stream.getTracks().forEach(t => t.stop());
 
     const blob = new Blob(recChunks, { type: 'audio/webm' });
     const path = `note-${Date.now()}-${Math.random().toString(36).slice(2,8)}.webm`;
-    toast('Saving note…');
+    toast(commentary ? 'Saving commentary…' : 'Saving note…');
 
     const { error: upErr } = await sb.storage.from('notes').upload(path, blob, { contentType: 'audio/webm' });
-    if (upErr) { toast('Error saving note: ' + upErr.message); return; }
+    if (upErr) { toast('Error saving: ' + upErr.message); return; }
 
-    const { error: dbErr } = await sb.from('voice_notes').insert({
+    const base = {
       episode_id: currentEp.id,
       collaborator_id: collaborator.id,
       timestamp_sec: ts,
       file_path: path
-    });
-    if (dbErr) { toast('Error saving note: ' + dbErr.message); return; }
+    };
+    let { error: dbErr } = await sb.from('voice_notes').insert({ ...base, is_commentary: commentary });
+    // If the is_commentary migration hasn't been run yet, still save the note
+    if (dbErr && /is_commentary/.test(dbErr.message || '')) {
+      console.warn('is_commentary column missing — run the migration. Saving without it.');
+      ({ error: dbErr } = await sb.from('voice_notes').insert(base));
+    }
+    if (dbErr) { toast('Error saving: ' + dbErr.message); return; }
 
-    toast('Note saved!');
+    toast(commentary ? 'Commentary saved — thank you!' : 'Note saved!');
     await loadNotes('r');
-    audio.play();
-    setPlayIcon('r', 'pause');
+    if (!commentary && wasPlaying) { audio.play(); setPlayIcon('r', 'pause'); }
   };
 
   recorder.start();
   isRec = true;
-  document.getElementById('mic-btn').classList.add('recording');
+  startRecTimer();
+  document.getElementById('rec-banner-text').textContent = commentary
+    ? 'Recording commentary… tap the button again to save'
+    : 'Recording… tap mic again to save';
+  if (!commentary) document.getElementById('mic-btn').classList.add('recording');
+  else setCommentaryBtn(true);
   document.getElementById('rec-banner').classList.add('on');
 }
 
@@ -1055,7 +1444,17 @@ async function handleUpload(input) {
 
   const title = document.getElementById('up-title').value.trim() || file.name.replace(/\.[^.]+$/, '');
   const folder = document.getElementById('up-folder').value.trim() || 'Uncategorized';
+  const accessCode = normCode(document.getElementById('up-code').value) || null;
   const path = `ep-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')}`;
+
+  if (accessCode) {
+    if (accessCode === normCode(PRODUCER_PW) || accessCode === normCode(GUEST_PW)) {
+      toast('That code clashes with a login password — pick another.');
+      input.value = ''; return;
+    }
+    const clash = await findEpisodeByCode(accessCode);
+    if (clash) { toast('That code is already used by "' + clash.title + '".'); input.value = ''; return; }
+  }
 
   const progWrap = document.getElementById('up-prog-wrap');
   const progFill = document.getElementById('up-prog-fill');
@@ -1079,7 +1478,7 @@ async function handleUpload(input) {
   progFill.style.width = '75%';
   status.textContent = 'Saving episode info…';
 
-  const { error: dbErr } = await sb.from('episodes').insert({ title, folder, file_path: path });
+  const { error: dbErr } = await sb.from('episodes').insert({ title, folder, file_path: path, access_code: accessCode });
   if (dbErr) {
     toast('Database error: ' + dbErr.message);
     status.textContent = 'Database error: ' + dbErr.message;
@@ -1095,9 +1494,10 @@ async function handleUpload(input) {
 
   document.getElementById('up-title').value = '';
   document.getElementById('up-folder').value = '';
+  document.getElementById('up-code').value = '';
   document.getElementById('upload-zone').style.pointerEvents = '';
   input.value = '';
-  toast('Episode uploaded!');
+  toast(accessCode ? 'Uploaded! Code: ' + accessCode : 'Episode uploaded!');
   await pLoadFolders();
 }
 
