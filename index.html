@@ -19,6 +19,7 @@
   --blue:#1478B0;        /* accessible mid-blue for small type */
   --blue-light:#E8F4FC;--blue-mid:#41B2EA;
   --coral:#D85A30;--coral-light:#FAECE7;--coral-border:#F0997B;--coral-dark:#712B13;
+  --red:#D0342C;--red-dark:#A62A22;
   --g100:#f7f7f6;--g200:#ebebea;--g300:#d3d1c7;--g400:#b4b2a9;
   --g600:#5f5e5a;--g900:#1a1a18;
   --r-md:10px;--r-lg:16px;--r-xl:24px;
@@ -105,12 +106,14 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .skip-btn:hover{background:var(--g200)}
 .skip-btn svg{width:17px;height:17px;fill:var(--g900)}
 .skip-btn span{font-size:9px;font-weight:700;line-height:1;letter-spacing:.02em}
-.mic-btn{width:52px;height:52px;border-radius:50%;background:var(--g100);border:1.5px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.mic-btn svg{width:22px;height:22px;stroke:var(--g600);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.mic-btn:hover{background:var(--g200)}
-.mic-btn.recording{background:var(--coral);border-color:var(--coral);animation:pulse-mic 1s infinite}
-.mic-btn.recording svg{stroke:white}
-@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(216,90,48,.4)}50%{box-shadow:0 0 0 8px rgba(216,90,48,0)}}
+.mic-btn{width:52px;height:52px;border-radius:50%;background:var(--red);border:1.5px solid var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 2px 10px rgba(208,52,44,.35)}
+.mic-btn svg{width:22px;height:22px;stroke:white;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.mic-btn:hover{background:var(--red-dark);border-color:var(--red-dark)}
+.mic-btn .stop-icon{display:none}
+.mic-btn.recording{background:var(--red-dark);border-color:var(--red-dark);animation:pulse-mic 1s infinite}
+.mic-btn.recording .mic-icon{display:none}
+.mic-btn.recording .stop-icon{display:block;fill:white;stroke:none;width:18px;height:18px}
+@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(208,52,44,.5)}50%{box-shadow:0 0 0 9px rgba(208,52,44,0)}}
 .rec-banner{display:none;align-items:center;gap:10px;background:var(--coral-light);border:1px solid var(--coral-border);border-radius:var(--r-md);padding:10px 14px;margin-top:1rem}
 .rec-banner.on{display:flex}
 .rec-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);animation:blink 1s infinite;flex-shrink:0}
@@ -182,7 +185,8 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .comm-copy{font-size:13px;line-height:1.55;color:var(--coral-dark);margin-bottom:1rem}
 .btn-coral{background:var(--coral);border-color:var(--coral);color:#fff}
 .btn-coral:hover{background:#c04e28}
-.btn-coral.recording{animation:pulse-mic 1s infinite}
+.btn-coral.recording{animation:pulse-coral 1s infinite}
+@keyframes pulse-coral{0%,100%{box-shadow:0 0 0 0 rgba(216,90,48,.45)}50%{box-shadow:0 0 0 9px rgba(216,90,48,0)}}
 .btn-coral svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .comm-note{font-size:11px;color:var(--coral-dark);opacity:.85;margin-top:8px;text-align:center}
 .badge-comm{background:var(--coral);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;letter-spacing:.02em}
@@ -232,6 +236,7 @@ select:focus{border-color:var(--blue)}
 @media(prefers-color-scheme:dark){
   :root{--g100:#1e1e1c;--g200:#2e2e2b;--g400:#888780;--g600:#b4b2a9;--g900:#f5f4f0;--blue-light:#0c1e30;--coral-light:#2a1410;--coral-border:#7a3a22;--coral-dark:#f0997b;
         --navy:#2A7FB8;--blue:#5DB6E4;--sky:#41B2EA;
+        --red:#E04A3C;--red-dark:#B8382C;
         --logo-word:url("data:image/png;base64,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")}
   .btn-primary:hover{background:#226a9c;border-color:#226a9c}
   .play-btn{box-shadow:0 4px 16px rgba(42,127,184,.32)}
@@ -432,8 +437,8 @@ select:focus{border-color:var(--blue)}
         <div class="guide-body">
           <ol class="guide-steps">
             <li><b>Press play</b> and listen. Use the <b>10</b> buttons to jump back or forward ten seconds, and the <b>1×</b> button to speed things up.</li>
-            <li><b>Hear something worth flagging?</b> Tap the <b>mic button</b> — the round one at the far right of the controls. The episode pauses automatically so you can talk, and the mic turns red while it's listening.</li>
-            <li><b>Tap the mic again</b> to save. Your note is pinned to that exact second — no need to write down timestamps.</li>
+            <li><b>Hear something worth flagging?</b> Tap the <b>red mic button</b> at the far right of the controls. The episode pauses automatically so you can talk.</li>
+            <li><b>Tap the red button again</b> to save — while you're recording it pulses and turns into a stop square. Your note is pinned to that exact second, so there are no timestamps to write down.</li>
             <li><b>Keep going.</b> Everything saves as you go, so you can close the page and pick it back up later.</li>
             <li>When you're done, <b>scroll to the bottom</b> if you'd like to record a closing commentary for the episode.</li>
           </ol>
@@ -443,7 +448,7 @@ select:focus{border-color:var(--blue)}
 
       <div class="card">
         <div class="player-title" id="r-ep-title"></div>
-        <div class="player-sub">Tap the mic to leave a voice note — audio pauses while you speak</div>
+        <div class="player-sub">Tap the red mic to leave a voice note — audio pauses while you speak</div>
         <div class="prog-area" id="r-prog-area">
           <div class="prog-track" id="r-prog-track">
             <div class="prog-bar" id="r-prog-bar"></div>
@@ -456,12 +461,13 @@ select:focus{border-color:var(--blue)}
           <button class="skip-btn" onclick="skip(-10)" title="Back 10s"><svg viewBox="0 0 24 24"><path d="M11 19V5l-8 7 8 7z"/><path d="M21 19V5l-8 7 8 7z"/></svg><span>10</span></button>
           <button class="play-btn" onclick="togglePlay('r')"><svg id="r-play-icon" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></button>
           <button class="skip-btn" onclick="skip(10)" title="Forward 10s"><svg viewBox="0 0 24 24"><path d="M13 5v14l8-7-8-7z"/><path d="M3 5v14l8-7-8-7z"/></svg><span>10</span></button>
-          <button class="mic-btn" id="mic-btn" onclick="toggleRecord()">
-            <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+          <button class="mic-btn" id="mic-btn" onclick="toggleRecord()" aria-label="Record a voice note">
+            <svg class="mic-icon" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            <svg class="stop-icon" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
           </button>
         </div>
-        <div class="rec-banner" id="rec-banner"><div class="rec-dot"></div><span id="rec-banner-text">Recording… tap mic again to save</span><span class="rec-timer" id="rec-timer">0:00</span></div>
-        <p class="mic-hint">Tap the mic to drop a voice note at this moment</p>
+        <div class="rec-banner" id="rec-banner"><div class="rec-dot"></div><span id="rec-banner-text">Recording… tap the red button again to save</span><span class="rec-timer" id="rec-timer">0:00</span></div>
+        <p class="mic-hint">Tap the red mic to drop a voice note at this moment</p>
       </div>
       <div class="card">
         <div class="card-title">Your notes</div>
@@ -1448,7 +1454,7 @@ async function toggleRecord(isCommentary) {
   startRecTimer();
   document.getElementById('rec-banner-text').textContent = commentary
     ? 'Recording commentary… tap the button again to save'
-    : 'Recording… tap mic again to save';
+    : 'Recording… tap the red button again to save';
   if (!commentary) document.getElementById('mic-btn').classList.add('recording');
   else setCommentaryBtn(true);
   document.getElementById('rec-banner').classList.add('on');
