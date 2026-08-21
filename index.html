@@ -149,6 +149,21 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .note-scrub-bar{height:4px;background:var(--blue);border-radius:2px;width:0%;pointer-events:none}
 .note-scrub-thumb{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);width:12px;height:12px;background:var(--blue);border-radius:50%;border:2px solid white;box-shadow:0 0 0 1px var(--blue);pointer-events:none}
 .note-scrub-time{display:flex;justify-content:space-between;font-size:10px;color:var(--g600);margin-top:2px;font-variant-numeric:tabular-nums}
+.note-status{display:none;font-size:11px;color:var(--g600);padding-left:48px;line-height:1.4}
+.note-status.warn{color:#a32d2d}
+
+/* Staged upload — file chosen but not yet sent */
+.staged{border:1.5px solid var(--blue-mid);background:var(--blue-light);border-radius:var(--r-lg);padding:14px}
+.staged-row{display:flex;align-items:center;gap:10px}
+.staged-icon{width:34px;height:34px;border-radius:8px;background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.staged-icon svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.staged-info{flex:1;min-width:0}
+.staged-name{font-size:13px;font-weight:600;word-break:break-word;line-height:1.3}
+.staged-meta{font-size:11px;color:var(--g600);margin-top:2px}
+.staged-x{background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;color:var(--g600);font-family:inherit}
+.staged-x svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.staged-actions{display:flex;gap:8px;margin-top:.75rem}
+.staged-actions .btn{flex:1}
 
 /* Collabs */
 .collab-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-md);border:1px solid var(--g200);margin-bottom:8px;background:white}
@@ -223,7 +238,7 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 
 /* Move modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
-.modal{background:white;border-radius:var(--r-xl);padding:1.5rem;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal{background:white;border-radius:var(--r-xl);padding:1.5rem;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.15);max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:4px}
 .modal p{font-size:13px;color:var(--g600);margin-bottom:1.25rem}
 .modal-actions{display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end}
@@ -336,7 +351,25 @@ select:focus{border-color:var(--blue)}
             <h3>Choose file</h3>
             <p>MP4, MP3, M4A, WAV</p>
           </div>
-          <input type="file" id="up-file" accept="audio/*,video/*" style="display:none" onchange="handleUpload(this)">
+          <input type="file" id="up-file" accept="audio/*,video/*" style="display:none" onchange="stageUpload(this)">
+
+          <!-- Chosen file sits here until Upload is confirmed. Nothing is sent before that. -->
+          <div class="staged" id="up-staged" style="display:none">
+            <div class="staged-row">
+              <div class="staged-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+              <div class="staged-info">
+                <div class="staged-name" id="up-staged-name"></div>
+                <div class="staged-meta" id="up-staged-meta"></div>
+              </div>
+              <button class="staged-x" onclick="clearStagedUpload()" aria-label="Remove file"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <p class="hint" id="up-staged-hint">Nothing has been uploaded yet. Check the title, folder and code above, then confirm.</p>
+            <div class="staged-actions">
+              <button class="btn btn-sm" id="up-cancel-btn" onclick="clearStagedUpload()">Cancel</button>
+              <button class="btn btn-primary btn-sm" id="up-confirm-btn" onclick="confirmUpload()">Upload episode</button>
+            </div>
+          </div>
+
           <div class="prog-wrap" id="up-prog-wrap"><div class="prog-fill" id="up-prog-fill"></div></div>
           <div class="upload-status" id="up-status"></div>
         </div>
@@ -493,7 +526,10 @@ select:focus{border-color:var(--blue)}
   </div>
 </div>
 
-<audio id="main-audio" style="display:none"></audio>
+<audio id="main-audio" playsinline preload="metadata" style="display:none"></audio>
+<!-- One long-lived element for note clips: iOS only lets us start playback on an
+     element it has already seen a user gesture on, so we reuse this one. -->
+<audio id="note-audio" playsinline preload="auto" style="display:none"></audio>
 
 <!-- Move modal -->
 <div class="modal-overlay" id="move-modal" style="display:none" onclick="if(event.target===this)closeMoveModal()">
@@ -570,6 +606,61 @@ select:focus{border-color:var(--blue)}
   </div>
 </div>
 
+<!-- Edit episode modal -->
+<div class="modal-overlay" id="edit-modal" style="display:none" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <h3>Edit episode</h3>
+    <p style="font-size:13px;color:var(--g600);margin-bottom:1rem">Change the details, or swap in a corrected audio file.</p>
+
+    <div class="form-group"><label>Title</label><input type="text" id="edit-title" placeholder="Episode title"></div>
+
+    <div class="form-group">
+      <label>Folder</label>
+      <input type="text" id="edit-folder" list="edit-folder-list" placeholder="Folder name">
+      <datalist id="edit-folder-list"></datalist>
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <select id="edit-status">
+        <option value="">No status</option>
+        <option value="needs-review">Needs review</option>
+        <option value="in-progress">In progress</option>
+        <option value="done">Done</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Private access code <span style="font-weight:400;color:var(--g400)">— optional</span></label>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="edit-code" placeholder="Blank for no code" autocapitalize="off" autocorrect="off" spellcheck="false" onblur="this.value=normCode(this.value)">
+        <button class="btn btn-sm" style="flex-shrink:0" onclick="document.getElementById('edit-code').value=randomCode()">Generate</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Audio file</label>
+      <div class="staged-row" style="margin-bottom:.6rem">
+        <div class="staged-icon" style="background:var(--g100)"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div class="staged-info">
+          <div class="staged-name" id="edit-file-name"></div>
+          <div class="staged-meta" id="edit-file-meta">Current file</div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-full" onclick="document.getElementById('edit-file').click()">Replace audio file…</button>
+      <input type="file" id="edit-file" accept="audio/*,video/*" style="display:none" onchange="stageEditFile(this)">
+      <p class="hint">Voice notes and their timestamps are kept. Swap in a file of the same length, or notes will point at the wrong moments.</p>
+    </div>
+
+    <div class="upload-status" id="edit-status-msg"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" id="edit-save-btn" onclick="confirmEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm delete dialog -->
 <div class="modal-overlay" id="delete-modal" style="display:none" onclick="if(event.target===this)closeDeleteModal()">
   <div class="modal">
@@ -601,7 +692,13 @@ let currentEp = null;
 let notes = [];
 let activeNote = -1;
 let doneNotes = new Set();
-let noteAudio = null;
+let currentPrefix = 'r';
+let allEpisodes = [];
+let stagedFile = null;      // picked in the upload card, not yet sent
+let editStagedFile = null;  // replacement audio picked in the edit modal
+let audioUnlocked = false;
+const noteBufCache = new Map();  // file_path -> ArrayBuffer
+const noteUrlCache = new Map();  // cache key   -> object URL
 let recorder = null;
 let isRec = false;
 let recChunks = [];
@@ -612,6 +709,7 @@ let recTimerInt = null;
 let speeds = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
 let pSpeed = 0, rSpeed = 0;
 const audio = document.getElementById('main-audio');
+const noteAudio = document.getElementById('note-audio');
 const WH = [6,10,18,14,22,16,9,20,13,11,17,8,15,20,11,14,7,19,12,16];
 
 // ── BOOT ────────────────────────────────────────
@@ -844,6 +942,7 @@ async function pLoadFolders() {
   const { data, error } = await sb.from('episodes').select('*').order('created_at', { ascending: false });
   if (error) { toast('Error loading episodes: ' + error.message); return; }
   const eps = data || [];
+  allEpisodes = eps;
   const list = document.getElementById('p-folders-list');
   if (!eps.length) { list.innerHTML = '<div class="empty">No episodes yet. Upload one below.</div>'; return; }
   const map = groupByFolder(eps);
@@ -911,6 +1010,7 @@ function openEpMenu(e, ep) {
   const dropdown = document.createElement('div');
   dropdown.className = 'ep-dropdown';
   dropdown.innerHTML = `
+    <button onclick="openEditModal()"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit episode</button>
     <button onclick="openMoveModal()"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Move to folder</button>
     <button onclick="openStatusModal()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Set status</button>
     <button onclick="openCodeModal()"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3"/></svg>Access code</button>
@@ -1125,9 +1225,10 @@ function rBackToList() { hide('r-player'); show('r-eplist'); stopAudio(); rRende
 // ── PLAYER ──────────────────────────────────────
 async function openEpisode(prefix, ep) {
   currentEp = ep;
+  currentPrefix = prefix;
   notes = [];
   activeNote = -1;
-  if (noteAudio) { noteAudio.pause(); noteAudio = null; }
+  stopNoteAudio();
 
   if (prefix === 'p') { hide('p-eplist'); show('p-player'); document.getElementById('p-ep-title').textContent = ep.title; document.getElementById('p-ep-sub').textContent = ep.folder; }
   else {
@@ -1169,7 +1270,7 @@ async function openEpisode(prefix, ep) {
 
 function stopAudio() {
   audio.pause(); audio.src = '';
-  if (noteAudio) { noteAudio.pause(); noteAudio = null; }
+  stopNoteAudio();
   isRec = false;
   if (recorder && recorder.state !== 'inactive') try { recorder.stop(); } catch(e) {}
   document.getElementById('rec-banner').classList.remove('on');
@@ -1243,14 +1344,12 @@ function toggleNoteDone(noteId, prefix) {
 async function downloadNote(n, btn) {
   if (btn) btn.classList.add('loading');
   try {
-    const { data: urlData } = sb.storage.from('notes').getPublicUrl(n.file_path);
-    const resp = await fetch(urlData.publicUrl);
-    if (!resp.ok) throw new Error('Could not fetch audio (' + resp.status + ')');
-    const blob = await resp.blob();
-    const ext = n.file_path.includes('.') ? n.file_path.split('.').pop() : 'webm';
+    const ab = await noteBuffer(n);
+    const mime = sniffAudioMime(ab) || 'audio/mp4';
+    const ext = extForMime(mime);
     const who = n.collaborators?.name ? n.collaborators.name.replace(/[^a-zA-Z0-9]+/g, '_') + '_' : '';
     const filename = `${who}note_${Math.floor(n.timestamp_sec)}s.${ext}`;
-    const blobUrl = URL.createObjectURL(blob);
+    const blobUrl = URL.createObjectURL(new Blob([ab], { type: mime }));
     const a = document.createElement('a');
     a.href = blobUrl; a.download = filename;
     document.body.appendChild(a);
@@ -1309,7 +1408,8 @@ function renderNotes(prefix) {
           <div class="note-scrub-thumb" id="scrub-thumb-${i}"></div>
         </div>
         <div class="note-scrub-time"><span id="scrub-cur-${i}">0:00</span><span id="scrub-dur-${i}">0:00</span></div>
-      </div>` : ''}`;
+      </div>
+      <div class="note-status" id="note-status-${i}"></div>` : ''}`;
     item.querySelector('.note-top').onclick = () => playNote(i, prefix);
     item.querySelector('.note-download').onclick = (e) => { e.stopPropagation(); downloadNote(n, e.currentTarget); };
     item.querySelector('.note-dismiss').onclick = (e) => { e.stopPropagation(); toggleNoteDone(n.id, prefix); };
@@ -1354,22 +1454,182 @@ function setupNoteScrub(i) {
   };
 }
 
-function playNote(i, prefix) {
-  if (noteAudio) { noteAudio.pause(); noteAudio = null; }
-  if (activeNote === i) { activeNote = -1; renderNotes(prefix); return; }
-  activeNote = i;
-  audio.currentTime = notes[i].timestamp_sec;
-  renderNotes(prefix);
-  const { data: urlData } = sb.storage.from('notes').getPublicUrl(notes[i].file_path);
-  noteAudio = new Audio(urlData.publicUrl);
-  noteAudio.onloadedmetadata = () => {
-    const durEl = document.getElementById('scrub-dur-' + i);
-    if (durEl) durEl.textContent = fmt(noteAudio.duration);
-  };
-  noteAudio.ontimeupdate = () => updateNoteScrub(i);
-  noteAudio.onended = () => { activeNote = -1; noteAudio = null; renderNotes(prefix); };
-  noteAudio.play();
+// ── NOTE CLIP PLAYBACK ──────────────────────────
+// Clips used to be uploaded as .webm/audio-webm no matter what the phone
+// actually recorded. iPhones record MP4/AAC, so those files were mislabelled;
+// desktop Chrome sniffs the bytes and plays them anyway, but iOS trusts the
+// Content-Type header and refuses. We now fetch the bytes, work out the real
+// container, and hand the browser a blob with the correct type.
+
+const MIME_EXT = {
+  'audio/webm': 'webm', 'audio/mp4': 'm4a', 'audio/aac': 'aac',
+  'audio/ogg': 'ogg', 'audio/wav': 'wav', 'audio/mpeg': 'mp3', 'audio/x-caf': 'caf'
+};
+
+function extForMime(m) {
+  return MIME_EXT[(m || '').split(';')[0].toLowerCase()] || 'webm';
 }
+
+function sniffAudioMime(ab) {
+  if (!ab || ab.byteLength < 12) return '';
+  const b = new Uint8Array(ab, 0, Math.min(16, ab.byteLength));
+  const s = (i, n) => String.fromCharCode.apply(null, b.subarray(i, i + n));
+  if (b[0] === 0x1A && b[1] === 0x45 && b[2] === 0xDF && b[3] === 0xA3) return 'audio/webm';
+  if (s(4, 4) === 'ftyp') return 'audio/mp4';
+  if (s(0, 4) === 'OggS') return 'audio/ogg';
+  if (s(0, 4) === 'RIFF' && s(8, 4) === 'WAVE') return 'audio/wav';
+  if (s(0, 4) === 'caff') return 'audio/x-caf';
+  if (s(0, 3) === 'ID3') return 'audio/mpeg';
+  if (b[0] === 0xFF && (b[1] & 0xE0) === 0xE0) return 'audio/mpeg';
+  return '';
+}
+
+function stopNoteAudio() {
+  try { noteAudio.pause(); } catch (e) {}
+  try { noteAudio.removeAttribute('src'); noteAudio.load(); } catch (e) {}
+}
+
+// iOS will only start audio on an element that has already played during a real
+// tap. We fetch clip bytes before playing, which breaks the gesture chain, so we
+// prime this element once on the very first touch anywhere in the app.
+const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  try {
+    noteAudio.src = SILENT_WAV;
+    const p = noteAudio.play();
+    if (p && p.catch) p.catch(() => {});
+  } catch (e) {}
+}
+document.addEventListener('touchend', unlockAudio, { passive: true, once: true });
+document.addEventListener('click', unlockAudio, { once: true });
+
+async function noteBuffer(n) {
+  if (noteBufCache.has(n.file_path)) return noteBufCache.get(n.file_path);
+  const { data: urlData } = sb.storage.from('notes').getPublicUrl(n.file_path);
+  const resp = await fetch(urlData.publicUrl);
+  if (!resp.ok) throw new Error('Could not fetch audio (' + resp.status + ')');
+  const ab = await resp.arrayBuffer();
+  noteBufCache.set(n.file_path, ab);
+  return ab;
+}
+
+async function playableNoteUrl(n) {
+  if (noteUrlCache.has(n.file_path)) return noteUrlCache.get(n.file_path);
+  const ab = await noteBuffer(n);
+  const url = URL.createObjectURL(new Blob([ab], { type: sniffAudioMime(ab) || 'audio/mp4' }));
+  noteUrlCache.set(n.file_path, url);
+  return url;
+}
+
+// Last resort for containers this browser genuinely can't decode (Opus-in-webm
+// on iOS): decode through Web Audio and re-wrap as a plain WAV.
+async function noteAsWavUrl(n) {
+  const key = n.file_path + '#wav';
+  if (noteUrlCache.has(key)) return noteUrlCache.get(key);
+  const ab = await noteBuffer(n);
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const decoded = await ctx.decodeAudioData(ab.slice(0));
+  const url = URL.createObjectURL(bufToWav(decoded));
+  noteUrlCache.set(key, url);
+  try { ctx.close(); } catch (e) {}
+  return url;
+}
+
+// MediaRecorder files often report Infinity until they've been seeked once.
+function settleDuration() {
+  if (isFinite(noteAudio.duration) && noteAudio.duration > 0) return Promise.resolve();
+  return new Promise(resolve => {
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      noteAudio.removeEventListener('durationchange', onDur);
+      try { noteAudio.currentTime = 0; } catch (e) {}
+      resolve();
+    };
+    const onDur = () => { if (isFinite(noteAudio.duration) && noteAudio.duration > 0) done(); };
+    noteAudio.addEventListener('durationchange', onDur);
+    try { noteAudio.currentTime = 1e7; } catch (e) { done(); }
+    setTimeout(done, 700);
+  });
+}
+
+function loadAndPlay(url) {
+  return new Promise((resolve, reject) => {
+    const ok = () => { cleanup(); resolve(); };
+    const bad = () => {
+      if (!noteAudio.error) return;   // stale event from a previous src
+      cleanup();
+      reject(new Error('This browser could not decode the clip'));
+    };
+    function cleanup() {
+      noteAudio.removeEventListener('loadedmetadata', ok);
+      noteAudio.removeEventListener('error', bad);
+    }
+    noteAudio.addEventListener('loadedmetadata', ok);
+    noteAudio.addEventListener('error', bad);
+    noteAudio.src = url;
+    noteAudio.load();
+  }).then(settleDuration).then(() => noteAudio.play());
+}
+
+function setNoteStatus(i, msg, warn) {
+  const el = document.getElementById('note-status-' + i);
+  if (!el) return;
+  el.textContent = msg || '';
+  el.className = 'note-status' + (warn ? ' warn' : '');
+  el.style.display = msg ? 'block' : 'none';
+}
+
+async function playNote(i, prefix) {
+  const wasActive = activeNote === i;
+  stopNoteAudio();
+  if (wasActive) { activeNote = -1; renderNotes(prefix); return; }
+
+  activeNote = i;
+  const n = notes[i];
+  if (!n.is_commentary) { try { audio.currentTime = n.timestamp_sec; } catch (e) {} }
+  renderNotes(prefix);
+  setNoteStatus(i, 'Loading clip…');
+
+  try {
+    const url = await playableNoteUrl(n);
+    if (activeNote !== i) return;
+    await loadAndPlay(url);
+    if (activeNote !== i) { stopNoteAudio(); return; }
+    setNoteStatus(i, '');
+  } catch (first) {
+    if (activeNote !== i) return;
+    setNoteStatus(i, 'Converting clip for this device…');
+    try {
+      const wavUrl = await noteAsWavUrl(n);
+      if (activeNote !== i) return;
+      await loadAndPlay(wavUrl);
+      if (activeNote !== i) { stopNoteAudio(); return; }
+      setNoteStatus(i, '');
+    } catch (second) {
+      console.error('note playback failed', first, second);
+      if (activeNote === i) setNoteStatus(i, 'This clip won\u2019t play here — tap the download arrow to open it in another app.', true);
+    }
+  }
+}
+
+noteAudio.addEventListener('timeupdate', () => { if (activeNote >= 0) updateNoteScrub(activeNote); });
+noteAudio.addEventListener('loadedmetadata', () => {
+  const durEl = document.getElementById('scrub-dur-' + activeNote);
+  if (durEl && isFinite(noteAudio.duration)) durEl.textContent = fmt(noteAudio.duration);
+});
+noteAudio.addEventListener('durationchange', () => {
+  const durEl = document.getElementById('scrub-dur-' + activeNote);
+  if (durEl && isFinite(noteAudio.duration)) durEl.textContent = fmt(noteAudio.duration);
+});
+noteAudio.addEventListener('ended', () => {
+  if (activeNote < 0) return;
+  activeNote = -1;
+  renderNotes(currentPrefix);
+});
 
 // ── RECORDING ───────────────────────────────────
 function setCommentaryBtn(recording) {
@@ -1413,7 +1673,13 @@ async function toggleRecord(isCommentary) {
   setPlayIcon('r', 'play');
   recChunks = [];
 
-  recorder = new MediaRecorder(stream);
+  // Prefer MP4/AAC: it is the one container every phone and desktop can play.
+  const preferredMime = pickRecorderMime();
+  try {
+    recorder = preferredMime ? new MediaRecorder(stream, { mimeType: preferredMime }) : new MediaRecorder(stream);
+  } catch (e) {
+    recorder = new MediaRecorder(stream);
+  }
   recorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
   recorder.onstop = async () => {
     isRec = false;
@@ -1423,11 +1689,13 @@ async function toggleRecord(isCommentary) {
     setCommentaryBtn(false);
     stream.getTracks().forEach(t => t.stop());
 
-    const blob = new Blob(recChunks, { type: 'audio/webm' });
-    const path = `note-${Date.now()}-${Math.random().toString(36).slice(2,8)}.webm`;
+    // Save with the container the recorder actually produced, not a guess.
+    const actualMime = ((recorder && recorder.mimeType) || preferredMime || 'audio/webm').split(';')[0];
+    const blob = new Blob(recChunks, { type: actualMime });
+    const path = `note-${Date.now()}-${Math.random().toString(36).slice(2,8)}.${extForMime(actualMime)}`;
     toast(commentary ? 'Saving commentary…' : 'Saving note…');
 
-    const { error: upErr } = await sb.storage.from('notes').upload(path, blob, { contentType: 'audio/webm' });
+    const { error: upErr } = await sb.storage.from('notes').upload(path, blob, { contentType: actualMime });
     if (upErr) { toast('Error saving: ' + upErr.message); return; }
 
     const base = {
@@ -1461,9 +1729,59 @@ async function toggleRecord(isCommentary) {
 }
 
 // ── UPLOAD ──────────────────────────────────────
-async function handleUpload(input) {
-  const file = input.files[0];
+function pickRecorderMime() {
+  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+  const candidates = ['audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/mpeg',
+                      'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+  for (const c of candidates) {
+    try { if (MediaRecorder.isTypeSupported(c)) return c; } catch (e) {}
+  }
+  return '';
+}
+
+function fileSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(0) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+
+// Picking a file only stages it. Nothing reaches Supabase until confirmUpload().
+function stageUpload(input) {
+  const file = input.files && input.files[0];
+  input.value = '';           // so re-picking the same file still fires change
   if (!file) return;
+  stagedFile = file;
+
+  const titleEl = document.getElementById('up-title');
+  if (!titleEl.value.trim()) titleEl.value = file.name.replace(/\.[^.]+$/, '');
+
+  document.getElementById('up-staged-name').textContent = file.name;
+  document.getElementById('up-staged-meta').textContent =
+    fileSize(file.size) + (file.type ? ' · ' + file.type : '');
+  document.getElementById('up-staged').style.display = 'block';
+  document.getElementById('upload-zone').style.display = 'none';
+  document.getElementById('up-status').textContent = '';
+  document.getElementById('up-prog-wrap').style.display = 'none';
+}
+
+function clearStagedUpload() {
+  stagedFile = null;
+  document.getElementById('up-staged').style.display = 'none';
+  document.getElementById('upload-zone').style.display = '';
+  document.getElementById('up-file').value = '';
+  document.getElementById('up-prog-wrap').style.display = 'none';
+  document.getElementById('up-status').textContent = '';
+}
+
+function setUploadBusy(busy) {
+  document.getElementById('up-confirm-btn').disabled = busy;
+  document.getElementById('up-cancel-btn').disabled = busy;
+  document.getElementById('up-confirm-btn').textContent = busy ? 'Uploading…' : 'Upload episode';
+}
+
+async function confirmUpload() {
+  const file = stagedFile;
+  if (!file) { toast('Choose a file first.'); return; }
 
   const title = document.getElementById('up-title').value.trim() || file.name.replace(/\.[^.]+$/, '');
   const folder = document.getElementById('up-folder').value.trim() || 'Uncategorized';
@@ -1473,28 +1791,27 @@ async function handleUpload(input) {
   if (accessCode) {
     if (accessCode === normCode(PRODUCER_PW) || accessCode === normCode(GUEST_PW)) {
       toast('That code clashes with a login password — pick another.');
-      input.value = ''; return;
+      return;
     }
     const clash = await findEpisodeByCode(accessCode);
-    if (clash) { toast('That code is already used by "' + clash.title + '".'); input.value = ''; return; }
+    if (clash) { toast('That code is already used by "' + clash.title + '".'); return; }
   }
 
   const progWrap = document.getElementById('up-prog-wrap');
   const progFill = document.getElementById('up-prog-fill');
   const status = document.getElementById('up-status');
 
+  setUploadBusy(true);
   progWrap.style.display = 'block';
   progFill.style.width = '15%';
   status.textContent = 'Uploading file…';
-  document.getElementById('upload-zone').style.pointerEvents = 'none';
 
   const { error: upErr } = await sb.storage.from('episodes').upload(path, file, { contentType: file.type, upsert: false });
   if (upErr) {
     toast('Upload failed: ' + upErr.message);
-    status.textContent = 'Upload failed. Try again.';
+    status.textContent = 'Upload failed. Your file is still selected — try again.';
     progWrap.style.display = 'none';
-    document.getElementById('upload-zone').style.pointerEvents = '';
-    input.value = '';
+    setUploadBusy(false);
     return;
   }
 
@@ -1505,23 +1822,142 @@ async function handleUpload(input) {
   if (dbErr) {
     toast('Database error: ' + dbErr.message);
     status.textContent = 'Database error: ' + dbErr.message;
+    await sb.storage.from('episodes').remove([path]);
     progWrap.style.display = 'none';
-    document.getElementById('upload-zone').style.pointerEvents = '';
-    input.value = '';
+    setUploadBusy(false);
     return;
   }
 
   progFill.style.width = '100%';
-  status.textContent = 'Episode uploaded successfully!';
-  setTimeout(() => { progWrap.style.display = 'none'; status.textContent = ''; }, 2000);
-
   document.getElementById('up-title').value = '';
   document.getElementById('up-folder').value = '';
   document.getElementById('up-code').value = '';
-  document.getElementById('upload-zone').style.pointerEvents = '';
-  input.value = '';
+  setUploadBusy(false);
+  clearStagedUpload();                       // hides the staged card, resets the drop zone
+  status.textContent = 'Episode uploaded successfully!';
+  setTimeout(() => { status.textContent = ''; }, 2500);
   toast(accessCode ? 'Uploaded! Code: ' + accessCode : 'Episode uploaded!');
   await pLoadFolders();
+}
+
+// ── EDIT EPISODE ────────────────────────────────
+function openEditModal() {
+  closeActiveDropdown();
+  if (!menuEp) return;
+  editStagedFile = null;
+
+  document.getElementById('edit-title').value = menuEp.title || '';
+  document.getElementById('edit-folder').value = menuEp.folder || '';
+  document.getElementById('edit-status').value = menuEp.status || '';
+  document.getElementById('edit-code').value = menuEp.access_code || '';
+  document.getElementById('edit-file-name').textContent =
+    (menuEp.file_path || '').replace(/^ep-\d+-/, '') || '(no file)';
+  document.getElementById('edit-file-meta').textContent = 'Current file';
+  document.getElementById('edit-status-msg').textContent = '';
+
+  const dl = document.getElementById('edit-folder-list');
+  dl.innerHTML = '';
+  [...new Set(allEpisodes.map(e => e.folder).filter(Boolean))].forEach(f => {
+    const o = document.createElement('option');
+    o.value = f;
+    dl.appendChild(o);
+  });
+
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+  document.getElementById('edit-file').value = '';
+  editStagedFile = null;
+}
+
+// Same pattern as the main uploader: choosing a file only stages it.
+function stageEditFile(input) {
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!f) return;
+  editStagedFile = f;
+  document.getElementById('edit-file-name').textContent = f.name;
+  document.getElementById('edit-file-meta').textContent =
+    'New file · ' + fileSize(f.size) + ' — uploads when you save';
+}
+
+async function confirmEdit() {
+  if (!menuEp) return;
+  const btn = document.getElementById('edit-save-btn');
+  const msg = document.getElementById('edit-status-msg');
+
+  const title = document.getElementById('edit-title').value.trim();
+  const folder = document.getElementById('edit-folder').value.trim() || 'Uncategorized';
+  const status = document.getElementById('edit-status').value || null;
+  const accessCode = normCode(document.getElementById('edit-code').value) || null;
+
+  if (!title) { msg.textContent = 'Give the episode a title.'; return; }
+  if (accessCode) {
+    if (accessCode === normCode(PRODUCER_PW) || accessCode === normCode(GUEST_PW)) {
+      msg.textContent = 'That code clashes with a login password — pick another.'; return;
+    }
+    const clash = await findEpisodeByCode(accessCode);
+    if (clash && clash.id !== menuEp.id) {
+      msg.textContent = 'That code is already used by "' + clash.title + '".'; return;
+    }
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  const patch = { title, folder, status, access_code: accessCode };
+  let oldPath = null;
+
+  if (editStagedFile) {
+    msg.textContent = 'Uploading new audio…';
+    const newPath = `ep-${Date.now()}-${editStagedFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')}`;
+    const { error: upErr } = await sb.storage.from('episodes')
+      .upload(newPath, editStagedFile, { contentType: editStagedFile.type, upsert: false });
+    if (upErr) {
+      msg.textContent = 'Upload failed: ' + upErr.message;
+      btn.disabled = false; btn.textContent = 'Save changes';
+      return;
+    }
+    patch.file_path = newPath;
+    oldPath = menuEp.file_path;
+  }
+
+  msg.textContent = 'Saving details…';
+  let { error } = await sb.from('episodes').update(patch).eq('id', menuEp.id);
+  // If the status column hasn't been migrated yet, save everything else.
+  if (error && /status/.test(error.message || '')) {
+    delete patch.status;
+    ({ error } = await sb.from('episodes').update(patch).eq('id', menuEp.id));
+  }
+  if (error) {
+    msg.textContent = 'Error saving: ' + error.message;
+    if (patch.file_path) await sb.storage.from('episodes').remove([patch.file_path]);
+    btn.disabled = false; btn.textContent = 'Save changes';
+    return;
+  }
+
+  if (oldPath && patch.file_path) await sb.storage.from('episodes').remove([oldPath]);
+
+  Object.assign(menuEp, patch);
+  const editedId = menuEp.id;
+  menuEp = null;
+  btn.disabled = false;
+  btn.textContent = 'Save changes';
+  closeEditModal();
+  toast('Episode updated.');
+
+  await pLoadFolders();
+  if (document.getElementById('p-eplist').style.display !== 'none') {
+    const refreshed = allEpisodes.filter(e => e.folder === currentFolder);
+    if (refreshed.length) { currentFolderEps = refreshed; pRenderEpList(refreshed); }
+    else pShowFolders();
+  }
+  // If the edited episode is open in the player, reload it so a swapped file plays.
+  if (currentEp && currentEp.id === editedId && document.getElementById('p-player').style.display !== 'none') {
+    const fresh = allEpisodes.find(e => e.id === editedId);
+    if (fresh) openEpisode('p', fresh);
+  }
 }
 
 // ── COLLABORATORS ────────────────────────────────
