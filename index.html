@@ -137,6 +137,13 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .note-top{display:flex;align-items:center;gap:10px;cursor:pointer}
 .note-ts{font-size:12px;font-weight:600;color:var(--blue);min-width:38px;font-variant-numeric:tabular-nums}
 .note-who{font-size:11px;color:var(--g600);min-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-who.mine{color:var(--blue);font-weight:600}
+.note-item.theirs{border-left:3px solid var(--coral)}
+.notes-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:1rem}
+.notes-head .card-title{margin-bottom:0}
+.check-row{display:flex;align-items:flex-start;gap:9px;cursor:pointer;margin-top:.6rem}
+.check-row input{width:17px;height:17px;margin-top:1px;flex-shrink:0;accent-color:var(--navy)}
+.check-row span{font-size:12.5px;color:var(--g900);line-height:1.4}
 .note-wave{flex:1;display:flex;align-items:center;gap:2px;height:28px}
 .note-wave span{display:inline-block;width:3px;border-radius:2px;background:var(--sky);opacity:.75}
 .nplay{width:28px;height:28px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -305,7 +312,7 @@ select:focus{border-color:var(--blue)}
     <div class="form-group">
       <label>Your name</label>
       <input type="text" id="code-name" placeholder="e.g. Dr. Patel" onkeydown="if(event.key==='Enter')startCodeSession()">
-      <p class="hint">So your notes are credited to you.</p>
+      <p class="hint" id="name-card-hint">So your notes are credited to you.</p>
     </div>
     <button class="btn btn-primary btn-full" id="code-name-btn" onclick="startCodeSession()">Start reviewing</button>
     <div class="err" id="code-name-err"></div>
@@ -344,6 +351,10 @@ select:focus{border-color:var(--blue)}
               <input type="text" id="up-code" placeholder="e.g. patel-heel-pain" autocapitalize="off" autocorrect="off" spellcheck="false" onblur="this.value=normCode(this.value)">
               <button class="btn btn-sm" style="flex-shrink:0" onclick="fillRandomUploadCode()">Generate</button>
             </div>
+            <label class="check-row" for="up-shared">
+              <input type="checkbox" id="up-shared">
+              <span>Let everyone using this code see each other's notes</span>
+            </label>
             <p class="hint">Give this code to one reviewer and they'll see <b>only this episode</b> — nothing else in the library.</p>
           </div>
           <div class="upload-zone" id="upload-zone" onclick="document.getElementById('up-file').click()">
@@ -474,6 +485,7 @@ select:focus{border-color:var(--blue)}
             <li><b>Tap the red button again</b> to save — while you're recording it pulses and turns into a stop square. Your note is pinned to that exact second, so there are no timestamps to write down.</li>
             <li><b>Keep going.</b> Everything saves as you go, so you can close the page and pick it back up later.</li>
             <li>When you're done, <b>scroll to the bottom</b> if you'd like to record a closing commentary for the episode.</li>
+            <li id="guide-shared" style="display:none"><b>You're reviewing alongside someone else.</b> Their notes appear in the list below with their name on them — tap any note to hear it, then add your own thoughts on top. Hit <b>Refresh</b> above the list to pull in anything new.</li>
           </ol>
           <p class="guide-foot">Safe to listen while driving — just tap the mic, talk, and tap again. You can review or delete anything in "Your notes" below.</p>
         </div>
@@ -503,7 +515,10 @@ select:focus{border-color:var(--blue)}
         <p class="mic-hint">Tap the red mic to drop a voice note at this moment</p>
       </div>
       <div class="card">
-        <div class="card-title">Your notes</div>
+        <div class="notes-head">
+          <div class="card-title" id="r-notes-title">Your notes</div>
+          <button class="btn btn-sm" id="r-refresh-btn" style="display:none" onclick="refreshNotes()">Refresh</button>
+        </div>
         <div id="r-notes-list"><div class="empty">No notes yet — hit the mic while listening</div></div>
       </div>
 
@@ -584,6 +599,11 @@ select:focus{border-color:var(--blue)}
         <input type="text" id="code-input" placeholder="e.g. patel-heel-pain" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="renderCodeLink()">
         <button class="btn btn-sm" style="flex-shrink:0" onclick="genCodeIntoModal()">Generate</button>
       </div>
+      <label class="check-row" for="code-shared">
+        <input type="checkbox" id="code-shared">
+        <span>Let everyone using this code see each other's notes<br>
+          <span style="color:var(--g600);font-size:11px">Give the same code to two reviewers — each types their own name, and they'll hear one another's notes and commentary.</span></span>
+      </label>
     </div>
     <div id="code-link-wrap" style="display:none">
       <div class="code-show">
@@ -637,6 +657,10 @@ select:focus{border-color:var(--blue)}
         <input type="text" id="edit-code" placeholder="Blank for no code" autocapitalize="off" autocorrect="off" spellcheck="false" onblur="this.value=normCode(this.value)">
         <button class="btn btn-sm" style="flex-shrink:0" onclick="document.getElementById('edit-code').value=randomCode()">Generate</button>
       </div>
+      <label class="check-row" for="edit-shared">
+        <input type="checkbox" id="edit-shared">
+        <span>Let everyone using this code see each other's notes</span>
+      </label>
     </div>
 
     <div class="form-group">
@@ -696,6 +720,7 @@ let currentPrefix = 'r';
 let allEpisodes = [];
 let stagedFile = null;      // picked in the upload card, not yet sent
 let editStagedFile = null;  // replacement audio picked in the edit modal
+let sharedColumnMissing = false;  // true if the shared_review migration hasn't been run
 let audioUnlocked = false;
 const noteBufCache = new Map();  // file_path -> ArrayBuffer
 const noteUrlCache = new Map();  // cache key   -> object URL
@@ -760,6 +785,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 // ── AUTH ────────────────────────────────────────
 // Codes are lowercased and stripped to letters/numbers/dashes so they survive
 // mobile autocapitalise and are safe to put in a URL.
+// True when this episode's code-holders are meant to see one another's notes.
+function isSharedReview() {
+  return role === 'episode' && !!(currentEp && currentEp.shared_review);
+}
+
 function normCode(s) {
   return (s || '').trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
 }
@@ -806,6 +836,9 @@ function promptForName(ep) {
   show('login-view');
   document.getElementById('login-view').style.display = 'flex';
   document.getElementById('name-card-ep').textContent = ep.title;
+  document.getElementById('name-card-hint').textContent = ep.shared_review
+    ? "So your notes are credited to you. You'll also see notes left by the other reviewer."
+    : 'So your notes are credited to you.';
   const saved = localStorage.getItem('wysdom-code-name');
   if (saved) document.getElementById('code-name').value = saved;
   setTimeout(() => document.getElementById('code-name').focus(), 100);
@@ -987,7 +1020,7 @@ async function pRenderEpList(items) {
         <div class="ep-title">${ep.title}</div>
         <div class="ep-sub">${ep.folder}</div>
       </div>
-      ${ep.access_code ? `<span class="code-badge" title="Private code: ${ep.access_code}"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3"/></svg>Code</span>` : ''}
+      ${ep.access_code ? `<span class="code-badge" title="Private code: ${ep.access_code}${ep.shared_review ? ' — reviewers see each other\'s notes' : ''}"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3"/></svg>${ep.shared_review ? 'Shared' : 'Code'}</span>` : ''}
       ${st ? `<span class="status-badge ${st.cls}">${st.label}</span>` : ''}
       ${count > 0 ? `<span class="badge">${count} note${count!==1?'s':''}</span>` : ''}
       <button class="ep-menu-btn" aria-label="Episode options" data-epid="${ep.id}">
@@ -1114,6 +1147,7 @@ function openCodeModal() {
   closeActiveDropdown();
   if (!menuEp) return;
   document.getElementById('code-modal-ep-name').textContent = menuEp.title;
+  document.getElementById('code-shared').checked = !!menuEp.shared_review;
   document.getElementById('code-input').value = menuEp.access_code || '';
   renderCodeLink();
   document.getElementById('code-modal').style.display = 'flex';
@@ -1133,10 +1167,16 @@ async function saveCode() {
     if (clash && clash.id !== menuEp.id) { toast('Already used by "' + clash.title + '".'); return; }
   }
 
-  const { error } = await sb.from('episodes').update({ access_code: code }).eq('id', menuEp.id);
+  const shared = document.getElementById('code-shared').checked;
+  let { error } = await sb.from('episodes').update({ access_code: code, shared_review: shared }).eq('id', menuEp.id);
+  if (error && /shared_review/.test(error.message || '')) {
+    warnSharedMigration();
+    ({ error } = await sb.from('episodes').update({ access_code: code }).eq('id', menuEp.id));
+  }
   if (error) { toast('Error saving code: ' + error.message); return; }
 
   menuEp.access_code = code;
+  menuEp.shared_review = shared;
   closeCodeModal();
   toast(code ? 'Access code saved.' : 'Access code removed.');
   pRenderEpList(currentFolderEps);
@@ -1237,6 +1277,10 @@ async function openEpisode(prefix, ep) {
     document.getElementById('r-back-btn').style.display = role === 'episode' ? 'none' : 'flex';
     document.getElementById('guide-card').classList.toggle('collapsed',
       localStorage.getItem('wysdom-guide-collapsed') === '1');
+    const shared = isSharedReview();
+    document.getElementById('r-notes-title').textContent = shared ? 'Notes on this episode' : 'Your notes';
+    document.getElementById('r-refresh-btn').style.display = shared ? 'inline-flex' : 'none';
+    document.getElementById('guide-shared').style.display = shared ? 'list-item' : 'none';
     setCommentaryBtn(false);
     window.scrollTo(0, 0);
   }
@@ -1317,13 +1361,42 @@ async function loadNotes(prefix) {
   if (error) { toast('Error loading notes: ' + error.message); return; }
   let all = data || [];
   if (role === 'guest') all = all.filter(n => !n.collaborators?.hidden_from_guest);
-  // Per-episode code reviewers only ever see their own notes
-  if (role === 'episode' && collaborator) all = all.filter(n => n.collaborator_id === collaborator.id);
+  // Per-episode code reviewers see only their own notes, unless this episode is
+  // set up for shared review — then everyone holding the code sees the whole thread.
+  if (role === 'episode' && collaborator && !isSharedReview()) {
+    all = all.filter(n => n.collaborator_id === collaborator.id);
+  }
   notes = all;
   loadDoneNotes();
   renderNotes(prefix);
   renderDots(prefix);
 }
+
+// Pull in anything the other reviewer has added since this page loaded, without
+// losing the clip that's currently playing.
+async function refreshNotes() {
+  if (!currentEp || isRec) return;
+  const btn = document.getElementById('r-refresh-btn');
+  const activeId = activeNote >= 0 && notes[activeNote] ? notes[activeNote].id : null;
+  const before = notes.length;
+  if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+
+  await loadNotes('r');
+
+  if (activeId) {
+    activeNote = notes.findIndex(n => n.id === activeId);
+    renderNotes('r');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh'; }
+
+  const added = notes.length - before;
+  if (added > 0) toast(added + ' new note' + (added !== 1 ? 's' : '') + ' loaded.');
+}
+
+// Coming back to the tab is the natural moment to check for new notes.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && isSharedReview() && !isRec) refreshNotes();
+});
 
 function loadDoneNotes() {
   const all = JSON.parse(localStorage.getItem('wysdom-done-notes') || '{}');
@@ -1386,14 +1459,18 @@ function renderNotes(prefix) {
     const active = activeNote === i;
     const done = doneNotes.has(n.id);
     const who = n.collaborators?.name || '';
+    const shared = isSharedReview();
+    const mine = !!(collaborator && n.collaborator_id === collaborator.id);
+    const whoLabel = shared ? (mine ? 'You' : (who || 'Reviewer')) : who;
     const item = document.createElement('div');
-    item.className = 'note-item' + (active ? ' active' : '') + (done ? ' note-done' : '');
+    item.className = 'note-item' + (active ? ' active' : '') + (done ? ' note-done' : '')
+      + (shared && !mine ? ' theirs' : '');
     item.id = 'ni-' + i;
     item.innerHTML = `
       <div class="note-top">
         <span class="note-ts">${n.is_commentary ? 'End' : fmt(n.timestamp_sec)}</span>
         ${n.is_commentary ? '<span class="badge-comm">Commentary</span>' : ''}
-        ${who ? `<span class="note-who">${who}</span>` : ''}
+        ${whoLabel ? `<span class="note-who${shared && mine ? ' mine' : ''}">${whoLabel}</span>` : ''}
         ${active ? '' : `<div class="note-wave">${WH.map(h=>`<span style="height:${h}px"></span>`).join('')}</div>`}
         <div class="nplay"><svg viewBox="0 0 24 24">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<path d="M5 3l14 9-14 9V3z"/>'}</svg></div>
         <button class="note-download" title="Download this clip"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/></svg></button>
@@ -1786,6 +1863,7 @@ async function confirmUpload() {
   const title = document.getElementById('up-title').value.trim() || file.name.replace(/\.[^.]+$/, '');
   const folder = document.getElementById('up-folder').value.trim() || 'Uncategorized';
   const accessCode = normCode(document.getElementById('up-code').value) || null;
+  const sharedReview = document.getElementById('up-shared').checked;
   const path = `ep-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')}`;
 
   if (accessCode) {
@@ -1818,7 +1896,13 @@ async function confirmUpload() {
   progFill.style.width = '75%';
   status.textContent = 'Saving episode info…';
 
-  const { error: dbErr } = await sb.from('episodes').insert({ title, folder, file_path: path, access_code: accessCode });
+  const row = { title, folder, file_path: path, access_code: accessCode };
+  let { error: dbErr } = await sb.from('episodes').insert({ ...row, shared_review: sharedReview });
+  // Fall back if the shared_review migration hasn't been run yet.
+  if (dbErr && /shared_review/.test(dbErr.message || '')) {
+    warnSharedMigration();
+    ({ error: dbErr } = await sb.from('episodes').insert(row));
+  }
   if (dbErr) {
     toast('Database error: ' + dbErr.message);
     status.textContent = 'Database error: ' + dbErr.message;
@@ -1832,6 +1916,7 @@ async function confirmUpload() {
   document.getElementById('up-title').value = '';
   document.getElementById('up-folder').value = '';
   document.getElementById('up-code').value = '';
+  document.getElementById('up-shared').checked = false;
   setUploadBusy(false);
   clearStagedUpload();                       // hides the staged card, resets the drop zone
   status.textContent = 'Episode uploaded successfully!';
@@ -1850,6 +1935,7 @@ function openEditModal() {
   document.getElementById('edit-folder').value = menuEp.folder || '';
   document.getElementById('edit-status').value = menuEp.status || '';
   document.getElementById('edit-code').value = menuEp.access_code || '';
+  document.getElementById('edit-shared').checked = !!menuEp.shared_review;
   document.getElementById('edit-file-name').textContent =
     (menuEp.file_path || '').replace(/^ep-\d+-/, '') || '(no file)';
   document.getElementById('edit-file-meta').textContent = 'Current file';
@@ -1906,7 +1992,8 @@ async function confirmEdit() {
 
   btn.disabled = true;
   btn.textContent = 'Saving…';
-  const patch = { title, folder, status, access_code: accessCode };
+  const patch = { title, folder, status, access_code: accessCode,
+                  shared_review: document.getElementById('edit-shared').checked };
   let oldPath = null;
 
   if (editStagedFile) {
@@ -1925,7 +2012,12 @@ async function confirmEdit() {
 
   msg.textContent = 'Saving details…';
   let { error } = await sb.from('episodes').update(patch).eq('id', menuEp.id);
-  // If the status column hasn't been migrated yet, save everything else.
+  // Drop any column that hasn't been migrated yet rather than losing the whole save.
+  if (error && /shared_review/.test(error.message || '')) {
+    warnSharedMigration();
+    delete patch.shared_review;
+    ({ error } = await sb.from('episodes').update(patch).eq('id', menuEp.id));
+  }
   if (error && /status/.test(error.message || '')) {
     delete patch.status;
     ({ error } = await sb.from('episodes').update(patch).eq('id', menuEp.id));
@@ -2105,6 +2197,14 @@ function bufToWav(buf) {
 }
 
 // ── UTILS ───────────────────────────────────────
+function warnSharedMigration() {
+  if (sharedColumnMissing) return;
+  sharedColumnMissing = true;
+  console.warn('The shared_review column is missing. Run:\n' +
+    'alter table episodes add column if not exists shared_review boolean not null default false;');
+  toast('Saved, but shared review needs a database migration — see the README SQL.');
+}
+
 function fmt(s) { s=Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
 function show(id) { document.getElementById(id).style.display='block'; }
 function hide(id) { document.getElementById(id).style.display='none'; }
