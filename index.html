@@ -213,6 +213,13 @@ label{display:block;font-size:12px;font-weight:500;color:var(--g600);margin-bott
 .comm-note{font-size:11px;color:var(--coral-dark);opacity:.85;margin-top:8px;text-align:center}
 .badge-comm{background:var(--coral);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;letter-spacing:.02em}
 .rec-timer{margin-left:auto;font-size:13px;font-weight:600;color:var(--coral-dark);font-variant-numeric:tabular-nums}
+.comm-rec{display:none;align-items:center;gap:9px;background:#fff;border:1px solid var(--coral-border);border-radius:var(--r-md);padding:10px 13px;margin-bottom:.7rem}
+.comm-rec.on{display:flex}
+.comm-rec span{font-size:12.5px;color:var(--coral-dark);font-weight:500}
+.comm-saved{display:none;background:#fff;border:1px solid var(--coral-border);border-radius:var(--r-md);padding:12px 13px;margin-top:.7rem}
+.comm-saved-text{font-size:12.5px;color:var(--g900);line-height:1.45}
+.comm-saved-text.warn{color:#a32d2d}
+.comm-saved .btn{margin-top:.6rem}
 
 /* Access code */
 .code-badge{display:inline-flex;align-items:center;gap:4px;background:#EAF3DE;color:#3B6D11;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
@@ -531,11 +538,20 @@ select:focus{border-color:var(--blue)}
         <p class="comm-copy">
           We're looking for a <b>1–5 minute commentary</b> to run at the very end of the episode. If there's anything you'd like to add — your take, extra context, a clinical caveat, where you think the field is heading — record it here. <b>You'll be credited in full</b> on the episode.
         </p>
+        <div class="comm-rec" id="comm-rec">
+          <div class="rec-dot"></div>
+          <span>Recording — tap the button below to stop &amp; save</span>
+          <span class="rec-timer" id="comm-timer">0:00</span>
+        </div>
         <button class="btn btn-coral btn-full" id="comm-btn" onclick="toggleRecord(true)">
           <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
           <span id="comm-btn-label">Record commentary</span>
         </button>
-        <p class="comm-note" id="comm-note">Optional — take as long or short as you like within about five minutes.</p>
+        <p class="comm-note" id="comm-note">Optional — up to 10 minutes. Keep this page open and your screen awake while you talk.</p>
+        <div class="comm-saved" id="comm-saved">
+          <div class="comm-saved-text" id="comm-saved-text"></div>
+          <button class="btn btn-sm" id="comm-saved-play" style="display:none">Play it back</button>
+        </div>
       </div>
     </div>
   </div>
@@ -721,6 +737,10 @@ let allEpisodes = [];
 let stagedFile = null;      // picked in the upload card, not yet sent
 let editStagedFile = null;  // replacement audio picked in the edit modal
 let sharedColumnMissing = false;  // true if the shared_review migration hasn't been run
+let recStartMs = 0;
+let recStopReason = null;   // 'interrupted' | 'maxlength' | null
+let recWakeLock = null;
+const MAX_REC_SEC = 600;    // hard cap so a forgotten recording can't run forever
 let audioUnlocked = false;
 const noteBufCache = new Map();  // file_path -> ArrayBuffer
 const noteUrlCache = new Map();  // cache key   -> object URL
@@ -1315,9 +1335,11 @@ async function openEpisode(prefix, ep) {
 function stopAudio() {
   audio.pause(); audio.src = '';
   stopNoteAudio();
+  if (isRec) stopRecording('interrupted');
   isRec = false;
-  if (recorder && recorder.state !== 'inactive') try { recorder.stop(); } catch(e) {}
+  releaseWakeLock();
   document.getElementById('rec-banner').classList.remove('on');
+  document.getElementById('comm-rec').classList.remove('on');
   document.getElementById('mic-btn').classList.remove('recording');
   stopRecTimer();
   setCommentaryBtn(false);
@@ -1717,22 +1739,95 @@ function setCommentaryBtn(recording) {
   label.textContent = recording ? 'Stop & save commentary' : 'Record commentary';
   btn.classList.toggle('recording', recording);
   note.textContent = recording
-    ? 'Recording your commentary — tap again when you\'re finished.'
-    : 'Optional — take as long or short as you like within about five minutes.';
+    ? 'Recording — tap again when you\'re finished. Keep this page open and the screen on.'
+    : 'Optional — up to 10 minutes. Keep this page open and your screen awake while you talk.';
 }
 
 function startRecTimer() {
-  const el = document.getElementById('rec-timer');
-  const t0 = Date.now();
-  el.textContent = '0:00';
+  recStartMs = Date.now();
   clearInterval(recTimerInt);
-  recTimerInt = setInterval(() => { el.textContent = fmt((Date.now() - t0) / 1000); }, 500);
+  const tick = () => {
+    const secs = (Date.now() - recStartMs) / 1000;
+    const txt = fmt(secs);
+    // The commentary button sits at the bottom of the page, far from the player's
+    // banner, so it needs its own elapsed readout.
+    ['rec-timer', 'comm-timer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    });
+    if (secs >= MAX_REC_SEC) stopRecording('maxlength');
+  };
+  tick();
+  recTimerInt = setInterval(tick, 250);
 }
 
 function stopRecTimer() { clearInterval(recTimerInt); recTimerInt = null; }
 
+// Stop and save whatever has been captured so far.
+function stopRecording(reason) {
+  if (!isRec || !recorder) return;
+  recStopReason = reason || null;
+  try { recorder.requestData(); } catch (e) {}   // flush the tail chunk
+  try { recorder.stop(); } catch (e) {}
+}
+
+// Phones sleep the screen mid-sentence and that kills the mic stream.
+async function acquireWakeLock() {
+  try {
+    if ('wakeLock' in navigator) recWakeLock = await navigator.wakeLock.request('screen');
+  } catch (e) { recWakeLock = null; }
+}
+
+function releaseWakeLock() {
+  try { if (recWakeLock) recWakeLock.release(); } catch (e) {}
+  recWakeLock = null;
+}
+
+// Leaving the page tears the recorder down. Save what we have rather than lose it.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && isRec) stopRecording('interrupted');
+});
+window.addEventListener('pagehide', () => { if (isRec) stopRecording('interrupted'); });
+
+function showCommMessage(text, warn) {
+  const box = document.getElementById('comm-saved');
+  const txt = document.getElementById('comm-saved-text');
+  const btn = document.getElementById('comm-saved-play');
+  if (!box) return;
+  box.style.display = 'block';
+  txt.textContent = text;
+  txt.className = 'comm-saved-text' + (warn ? ' warn' : '');
+  btn.style.display = 'none';
+}
+
+// Answers "how do I listen to what I just recorded?" right where they recorded it.
+function showCommSaved(idx, secs, reason) {
+  const box = document.getElementById('comm-saved');
+  const txt = document.getElementById('comm-saved-text');
+  const btn = document.getElementById('comm-saved-play');
+  if (!box) return;
+  const lead = reason === 'interrupted'
+    ? 'Your screen locked or you left the page, so recording stopped early. We saved the '
+    : reason === 'maxlength'
+      ? 'That hit the 10-minute limit, so we saved the first '
+      : 'Commentary saved — ';
+  box.style.display = 'block';
+  txt.textContent = lead + fmt(secs) + ' we captured. It\u2019s in the notes list above, marked "Commentary".';
+  txt.className = 'comm-saved-text' + (reason ? ' warn' : '');
+  if (idx >= 0) {
+    btn.style.display = 'inline-flex';
+    btn.onclick = () => {
+      playNote(idx, 'r');
+      const list = document.getElementById('r-notes-list');
+      if (list) list.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
 async function toggleRecord(isCommentary) {
-  if (isRec) { recorder.stop(); return; }
+  if (isRec) { stopRecording(null); return; }
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
   catch { toast('Mic access denied. Please allow microphone access.'); return; }
@@ -1749,31 +1844,52 @@ async function toggleRecord(isCommentary) {
   audio.pause();
   setPlayIcon('r', 'play');
   recChunks = [];
+  recStopReason = null;
+  document.getElementById('comm-saved').style.display = 'none';
 
-  // Prefer MP4/AAC: it is the one container every phone and desktop can play.
-  const preferredMime = pickRecorderMime();
-  try {
-    recorder = preferredMime ? new MediaRecorder(stream, { mimeType: preferredMime }) : new MediaRecorder(stream);
-  } catch (e) {
-    recorder = new MediaRecorder(stream);
-  }
-  recorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
+  // Let the browser choose its own container. Forcing one it merely claims to
+  // support produced truncated files; we read back the real type below.
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = e => { if (e.data && e.data.size > 0) recChunks.push(e.data); };
+  recorder.onerror = () => stopRecording('interrupted');
+  // If the OS pulls the mic away (call, screen lock, another app), save what we have.
+  stream.getAudioTracks().forEach(t => t.addEventListener('ended', () => stopRecording('interrupted')));
+
   recorder.onstop = async () => {
     isRec = false;
+    const elapsed = (Date.now() - recStartMs) / 1000;
+    const reason = recStopReason;
     stopRecTimer();
+    releaseWakeLock();
     document.getElementById('mic-btn').classList.remove('recording');
     document.getElementById('rec-banner').classList.remove('on');
+    document.getElementById('comm-rec').classList.remove('on');
     setCommentaryBtn(false);
-    stream.getTracks().forEach(t => t.stop());
+    try { stream.getTracks().forEach(t => t.stop()); } catch (e) {}
 
     // Save with the container the recorder actually produced, not a guess.
-    const actualMime = ((recorder && recorder.mimeType) || preferredMime || 'audio/webm').split(';')[0];
+    const actualMime = ((recorder && recorder.mimeType) || 'audio/webm').split(';')[0];
     const blob = new Blob(recChunks, { type: actualMime });
+    recChunks = [];
+
+    // An empty blob used to upload happily, leaving a note that existed but
+    // played nothing. Fail loudly instead of saving silence.
+    if (blob.size < 1200) {
+      toast('That recording came out empty — nothing was saved.');
+      if (commentary) showCommMessage('That recording came out empty, so nothing was saved. Tap "Record commentary" and try again — keep this page open while you talk.', true);
+      return;
+    }
+
     const path = `note-${Date.now()}-${Math.random().toString(36).slice(2,8)}.${extForMime(actualMime)}`;
     toast(commentary ? 'Saving commentary…' : 'Saving note…');
+    if (commentary) showCommMessage('Saving your commentary… please keep this page open.', false);
 
     const { error: upErr } = await sb.storage.from('notes').upload(path, blob, { contentType: actualMime });
-    if (upErr) { toast('Error saving: ' + upErr.message); return; }
+    if (upErr) {
+      toast('Error saving: ' + upErr.message);
+      if (commentary) showCommMessage('Upload failed: ' + upErr.message + '. Nothing was lost on your device yet — try recording again on a stronger connection.', true);
+      return;
+    }
 
     const base = {
       episode_id: currentEp.id,
@@ -1787,35 +1903,38 @@ async function toggleRecord(isCommentary) {
       console.warn('is_commentary column missing — run the migration. Saving without it.');
       ({ error: dbErr } = await sb.from('voice_notes').insert(base));
     }
-    if (dbErr) { toast('Error saving: ' + dbErr.message); return; }
+    if (dbErr) {
+      toast('Error saving: ' + dbErr.message);
+      if (commentary) showCommMessage('Could not save: ' + dbErr.message, true);
+      return;
+    }
 
     toast(commentary ? 'Commentary saved — thank you!' : 'Note saved!');
     await loadNotes('r');
+
+    if (commentary) {
+      showCommSaved(notes.findIndex(n => n.file_path === path), elapsed, reason);
+    } else if (reason) {
+      toast('Recording stopped early — we saved the ' + fmt(elapsed) + ' we captured.');
+    }
     if (!commentary && wasPlaying) { audio.play(); setPlayIcon('r', 'pause'); }
   };
 
-  recorder.start();
+  // A timeslice hands us a chunk every second. Without it everything is buffered
+  // until stop, so an interrupted recording came back empty or truncated.
+  recorder.start(1000);
   isRec = true;
   startRecTimer();
+  acquireWakeLock();
   document.getElementById('rec-banner-text').textContent = commentary
     ? 'Recording commentary… tap the button again to save'
     : 'Recording… tap the red button again to save';
   if (!commentary) document.getElementById('mic-btn').classList.add('recording');
-  else setCommentaryBtn(true);
+  else { setCommentaryBtn(true); document.getElementById('comm-rec').classList.add('on'); }
   document.getElementById('rec-banner').classList.add('on');
 }
 
 // ── UPLOAD ──────────────────────────────────────
-function pickRecorderMime() {
-  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
-  const candidates = ['audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/mpeg',
-                      'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
-  for (const c of candidates) {
-    try { if (MediaRecorder.isTypeSupported(c)) return c; } catch (e) {}
-  }
-  return '';
-}
-
 function fileSize(b) {
   if (b < 1024) return b + ' B';
   if (b < 1048576) return (b / 1024).toFixed(0) + ' KB';
